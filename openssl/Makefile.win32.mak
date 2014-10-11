@@ -468,7 +468,7 @@ _TARGET: $(SRCDIR)\openssl-1.0.1g\INSTALL.W32
 	cd $(SRCDIR)\openssl-1.0.1g
 	nmake -f $(MAKEFILE_DIR)\Makefile.win32.mak _TARGET2
 
-_TARGET2: $(TMP_D) $(INCO_D) $(BIN_D) $(LIB_D) headers lib
+_TARGET2: $(TMP_D) $(INCO_D) $(BIN_D) $(LIB_D) headers lib exe
 #__all: banner $(TMP_D) $(BIN_D) $(TEST_D) $(LIB_D) $(INCO_D) headers lib exe 
 
 banner:
@@ -513,7 +513,7 @@ headers: $(HEADER) $(EXHEADER)
 
 lib: $(LIBS_DEP) #$(E_SHLIB)
 
-exe: $(T_EXE) $(BIN_D)\$(E_EXE).exe
+exe: $(BINDIR)\$(E_EXE)$(DLLSFX).exe
 
 install: all
 	$(MKDIR) "$(INSTALLTOP)"
@@ -3467,8 +3467,8 @@ $(ENG_D)\gost.dll: $(GOSTOBJ)
 	IF EXIST $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
 
 
-$(BIN_D)\$(E_EXE).exe: $(E_OBJ) $(LIBS_DEP)
-	$(LINK) $(LFLAGS) /out:$(BIN_D)\$(E_EXE).exe @<<
+$(BINDIR)\$(E_EXE)$(DLLSFX).exe: $(E_OBJ) $(LIBS_DEP)
+	$(LINK) $(LFLAGS) /out:$(BINDIR)\$(E_EXE)$(DLLSFX).exe /pdb:$(PDBDIR)\$(E_EXE)$(DLLSFX).pdb @<<
 	$(APP_EX_OBJ) $(E_OBJ) $(L_LIBS) $(EX_LIBS)
 <<
 	IF EXIST $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;1

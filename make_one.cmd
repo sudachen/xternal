@@ -49,6 +49,7 @@ for %%n in (%ENVIRONS%) do (
 	for %%d in (%DEBUG_SET%) do (
 		if not .%%d. == .x. (
 	            	for %%s in (%STATIC_SET%) do (
+				echo %PROJECT%
           			set DEBUG=%%d
           			set STATIC=%%s
           			cmd /c %%n %MAKEDIR%build_target.cmd %ACTION%

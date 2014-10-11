@@ -1,0 +1,30 @@
+
+_ALL: ALL
+
+!if "$(CPU)"=="X64"
+CPU = X64
+!else
+CPU = X86
+!endif
+
+!if "$(COMPIGEN)" == ""
+COMPIGEN=10
+!endif
+
+CPUSFX = -$(COMPIGEN)-$(CPU)
+CXXFLAGS = -wd4530 -FC -D_TRACEXPT -D_STRICT -Zi -Od -MDd -EHsc -GR -D_USESTL -I$(XTERNAL)\include
+LIBRARIES = gtest-md$(COMPIGEN)d.lib libconf-md$(COMPIGEN)d.lib
+LINKOPTS = -link -opt:ref -opt:icf=10 -machine:$(CPU)
+LIB = ..\..\lib;$(LIB)
+
+BINDIR=..\..\bin
+
+!if "$(ANALYZE)"=="YES"
+CXXFLAGS = $(CXXFLAGS) -analyze -WX
+!endif
+
+clean::
+	-del /q $(TESTS) *.obj *.map *.ilk *.pdb *.exe
+
+build: ALL
+rebuild: clean ALL

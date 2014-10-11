@@ -1,0 +1,10 @@
+zlib
+openssl
+libpng
+libjpeg
+libtiff
+expat
+libwx3
+libpe
+libconf
+

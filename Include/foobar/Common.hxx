@@ -60,7 +60,8 @@ in this Software without prior written authorization of the copyright holder.
 #endif
 
 #define OVERRIDE
-#define FOOBAR_ASSERT(Expr) assert(Expr)
+#define FOOBAR_ASSERT(Expr)  assert(Expr)
+#define FOOBAR_UNREACHABLE() abort()
 
 #define FOOBAR_CONCAT(a,b) a##b
 #define FOOBAR_E2(a,b) a b
@@ -94,9 +95,9 @@ namespace foobar
 		operator T() const { return value; }
 		operator int() const { return value; }
 		operator unsigned int() const { return value; }
-		Enum& operator = (int a) { value = a; return *this; };
-		Enum& operator |= (int a) { value = T(value | a); return *this; };
-		T operator | (T a) const { return T (value | a); };
+        Enum& operator = (int a) { value = a; return *this; }
+        Enum& operator |= (int a) { value = T(value | a); return *this; }
+        T operator | (T a) const { return T (value | a); }
 		Enum(int a) : value((T)a) {}
 		Enum(T a) : value(a) {}
 	};
@@ -140,35 +141,65 @@ namespace foobar
 	template<> struct Opposite<wchar_t>  { typedef char    Type; };
 
 	template < class T >
-	struct Option
+    struct Option
 	{
-		T value;
+        __declspec(align(8)) uint8_t value[sizeof(T)];
 		bool specified;
-		Option() {}
-		Option(T value) : value(value), specified(true) {}
-		Option(NoneValue) : value(), specified(false) {}
+        Option() : specified(false) {}
+        Option(NoneValue) : specified(false) {}
+        Option(T value) : specified(true)
+        {
+            new (&this->value[0]) T(value);
+        }
 
-		T& operator *() { return value; }
-		const T& operator *() const { return value; }
-		operator T& () { return value; }
-		operator const T& () const { return value; }
+        ~Option()
+        {
+            if ( specified ) ((T*)&this->value[0])->~T();
+        }
 
-		T* operator ->() { return &value; }
-		const T* operator ->() const { return &value; }
+        Option& operator=(const Option& o)
+        {
+            Option(o).Swap(*this);
+            return *this;
+        }
+
+        Option(const Option& o) : specified(o.specified)
+        {
+            if ( specified ) { new (&this->value[0]) T(*(T*)&o.value[0]); }
+        }
+
+        Option(Option&& o) : specified(o.specified)
+        {
+            memcpy(this->value,o.value,sizeof(this->value));
+        }
+
+        T& operator *() { return Get(); }
+        const T& operator *() const { return Get(); }
+        operator T& () { return Get(); }
+        operator const T& () const { return Get(); }
+
+        T* operator ->() { return &Get(); }
+        const T* operator ->() const { return &Get(); }
 
 		bool operator ==(NoneValue) const { return !specified; }
 		bool operator !=(NoneValue) const { return specified; }
+		bool Exists() const { return specified; }
 
 		Option& Swap(Option& o)
 		{
-			swap(value, o.value);
+            swap(value, o.value); // FIX ME!
 			std::swap(specified, o.specified);
 			return *this;
 		}
 
-		const T& Get() const { return value;}
+        const T& Get() const
+        {
+            FOOBAR_ASSERT(specified != false);
+            return *(T*)&value[0];
+        }
 		typedef const T&(Option<T>::*BooleanType)() const;
 		operator BooleanType() const { return &Option<T>::Get; }
+
 	};
 
 	template < class T >
@@ -238,4 +269,82 @@ namespace foobar
 
 	static const Boolean True = Boolean(1);
 	static const Boolean False = Boolean(0);
+
+    struct VoidValue
+    {
+        VoidValue(){}
+        VoidValue(NoneValue){}
+    };
+
+    template<class T, class Ex>
+    struct Either
+    {
+        Option<T> r;
+        Option<Ex> ex;
+        Either(T&& value) : r(std::move(value)) {}
+        Either(const T& value) : r(value) {}
+        Either(Ex&& e) : ex(std::move(e)) {}
+        Either(const Ex& e) : ex(e) {}
+        Either(const Option<T>& value, const Option<Ex>& e) : r(value), ex(e) {}
+        const T& Get() const
+        {
+            if ( ex != None ) throw ex.Get();
+            if ( r != None ) return r.Get();
+            FOOBAR_UNREACHABLE();
+        }
+        operator const T&() const { return Get(); }
+        bool Succeeded() const { return ex == None && r != None; }
+        bool Failed() const { return !Succeeded(); }
+    };
+
+    template<class Ex>
+    struct Either<void,Ex>
+    {
+        Option<Ex> ex;
+        Either(Ex&& e) : ex(std::move(e)) {}
+        Either(VoidValue){}
+        Either(const Ex& e) : ex(e) {}
+        Either(const Option<VoidValue>& value, const Option<Ex>& e) : ex(e) {}
+        bool Succeeded() const { return ex == None; }
+        bool Failed() const { return !Succeeded(); }
+    };
+
+    typedef std::runtime_error Error;
+
+    template <class T> struct UnVoid { typedef T Type; };
+    template <> struct UnVoid<void> { typedef VoidValue Type; };
+
+    template <class T>
+    struct Result : Either<T, Error>
+    {
+        typedef Either<T, Error> _Base;
+        typedef typename UnVoid<T>::Type X;
+        Result(X&& value) : _Base(std::move(value)) {}
+        Result(const X& value) : _Base(value) {}
+        Result(Error&& e) : _Base(std::move(e)) {}
+        Result(const Error& e) : _Base(e) {}
+        Result(NoneValue) : _Base(X(None)) {}
+        //template <class U> Result(const Option<T>& value, const Result<U>& r) : _Base(value,r.ex){}
+    };
+
+    struct Die
+    {
+        template <class T, class Ex> void operator ||(const Either<T,Ex>& e) const
+        {
+            if ( e.ex.Exists() )
+            {
+                throw *e.ex;
+            }
+        }
+
+        template <class T, class Ex> void operator |(const Either<T,Ex>& e) const
+        {
+            operator || (*this,e);
+        }
+    };
+
+    template <class T, class Ex> void operator ||(const Either<T,Ex>& e, Die d) { d || e; }
+    template <class T, class Ex> void operator |(const Either<T,Ex>& e, Die d) { d || e; }
+
+    static const Die die = {};
 }

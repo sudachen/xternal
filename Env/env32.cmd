@@ -9,7 +9,7 @@ if not .%PROCESSOR_ARCHITECTURE%. == .x86. set VS120COMNTOOLS="%ProgramFiles(x86
 call "%VS120COMNTOOLS%\..\..\VC\vcvarsall.bat" x86
 
 set TARGET_CPU=X86
-set TARGET_INFIX=_32
+set TARGET_INFIX=_32r12
 
 %*
 

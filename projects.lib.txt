@@ -1,4 +1,5 @@
 zlib
+openssl
 libhash
 libpe
 

@@ -28,19 +28,22 @@ PLATFORM=VC-WIN64A
 !endif
 CC=cl
 
-RT=D
 #-DZLIB_SHARED
 DSO=
 #-DDSO_WIN32
 
 !if "$(DEBUG)"=="YES"
-CFLAG= /GS /RTC1 /D_DEBUG /FC /M$(RT)d /Od  $(DSO) -DZLIB -DOPENSSL_THREADS -W3 -nologo -DOPENSSL_SYSNAME_WIN32 -DWIN32_LEAN_AND_MEAN -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE -DOPENSSL_USE_APPLINK -I. -DOPENSSL_NO_RC5 -DOPENSSL_NO_MD2 -DOPENSSL_NO_KRB5 -DOPENSSL_NO_JPAKE -DOPENSSL_NO_STATIC_ENGINE    
+CFLAG= /GS /RTC1 /D_DEBUG /FC /M$(VCRT) /Od  $(DSO) -DZLIB -DOPENSSL_THREADS -W3 -nologo -DOPENSSL_SYSNAME_WIN32 -DWIN32_LEAN_AND_MEAN -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE -DOPENSSL_USE_APPLINK -I. -DOPENSSL_NO_RC5 -DOPENSSL_NO_MD2 -DOPENSSL_NO_KRB5 -DOPENSSL_NO_JPAKE -DOPENSSL_NO_STATIC_ENGINE    
 !else
-CFLAG= /M$(RT) /Ox /O2 /Ob2 $(DSO) -DZLIB -DOPENSSL_THREADS -W3 -Gs0 -GF -Gy -nologo -DOPENSSL_SYSNAME_WIN32 -DWIN32_LEAN_AND_MEAN -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE -DOPENSSL_USE_APPLINK -I. -DOPENSSL_NO_RC5 -DOPENSSL_NO_MD2 -DOPENSSL_NO_KRB5 -DOPENSSL_NO_JPAKE -DOPENSSL_NO_STATIC_ENGINE    
+CFLAG= /M$(VCRT) /Ox /O2 /Ob2 $(DSO) -DZLIB -DOPENSSL_THREADS -W3 -Gs0 -GF -Gy -nologo -DOPENSSL_SYSNAME_WIN32 -DWIN32_LEAN_AND_MEAN -DL_ENDIAN -D_CRT_SECURE_NO_DEPRECATE -DOPENSSL_USE_APPLINK -I. -DOPENSSL_NO_RC5 -DOPENSSL_NO_MD2 -DOPENSSL_NO_KRB5 -DOPENSSL_NO_JPAKE -DOPENSSL_NO_STATIC_ENGINE    
 !endif
 
 APP_CFLAG= /Zi /Fd$(TMP_D)/app
+!if "$(STATIC_LIB)"!="YES"
 LIB_CFLAG= /Zi /Fd$(TMP_D)/lib -D_WINDLL
+!else
+LIB_CFLAG= /Zi /Fd$(PDBNAME)
+!endif
 SHLIB_CFLAG=
 APP_EX_OBJ=setargv.obj $(OBJ_D)\applink.obj /implib:$(TMP_D)\junk.lib
 SHLIB_EX_OBJ=
@@ -109,8 +112,13 @@ ENG_D=$(OUT_D)
 OBJ_D=$(TMP_D)
 INCL_D=$(TMP_D)
 
+!if "$(STATIC_LIB)"!="YES"
 O_SSL=     $(BINDIR)\$(SSL)$(DLLSFX).dll
 O_CRYPTO=  $(BINDIR)\$(CRYPTO)$(DLLSFX).dll
+!else
+O_SSL=     $(LIBDIR)\$(SSL)$(LIBSFX).lib
+O_CRYPTO=  $(LIBDIR)\$(CRYPTO)$(LIBSFX).lib
+!endif
 P_SSL=     $(PDBDIR)\$(SSL)$(DLLSFX).pdb
 P_CRYPTO=  $(PDBDIR)\$(CRYPTO)$(DLLSFX).pdb
 SO_SSL=    $(SSL)
@@ -134,7 +142,7 @@ LIBS_DEP=$(O_CRYPTO) $(O_SSL)
 HEADER=$(INCL_D)\e_os.h \
 	$(INCL_D)\cryptlib.h $(INCL_D)\buildinf.h $(INCL_D)\md32_common.h \
 	$(INCL_D)\o_time.h $(INCL_D)\o_str.h $(INCL_D)\o_dir.h \
-	$(INCL_D)\md4_locl.h $(INCL_D)\md5_locl.h $(INCL_D)\sha_locl.h \
+	$(INCL_D)\constant_time_locl.h $(INCL_D)\md4_locl.h $(INCL_D)\md5_locl.h $(INCL_D)\sha_locl.h \
 	$(INCL_D)\rmd_locl.h $(INCL_D)\rmdconst.h $(INCL_D)\des_locl.h \
 	$(INCL_D)\rpc_des.h $(INCL_D)\spr.h $(INCL_D)\des_ver.h \
 	$(INCL_D)\rc2_locl.h $(INCL_D)\rc4_locl.h $(INCL_D)\idea_lcl.h \
@@ -455,17 +463,18 @@ E_SHLIB=$(ENG_D)\4758cca.dll \
 
 ###################################################################
 
-$(SRCDIR)\openssl-1.0.1g\INSTALL.W32:
-	@7z x -o$(SRCDIR) openssl-1.0.1g.lzma
-	copy /y opensslconf.h $(SRCDIR)\openssl-1.0.1g\crypto
-	copy /y buildinf.h $(SRCDIR)\openssl-1.0.1g\crypto
-	copy /y version32.rc $(SRCDIR)\openssl-1.0.1g\ms
-	copy /y libeay32.def $(SRCDIR)\openssl-1.0.1g\ms
-	copy /y ssleay32.def $(SRCDIR)\openssl-1.0.1g\ms
-	copy /y uptable.obj  $(SRCDIR)\openssl-1.0.1g\ms
+OPENSSL_10x=openssl-1.0.1l
+$(SRCDIR)\$(OPENSSL_10x)\INSTALL.W32:
+	@7z x -o$(SRCDIR) $(OPENSSL_10x).lzma
+	copy /y opensslconf.h $(SRCDIR)\$(OPENSSL_10x)\crypto
+	copy /y buildinf.h $(SRCDIR)\$(OPENSSL_10x)\crypto
+	copy /y version32.rc $(SRCDIR)\$(OPENSSL_10x)\ms
+	copy /y libeay32.def $(SRCDIR)\$(OPENSSL_10x)\ms
+	copy /y ssleay32.def $(SRCDIR)\$(OPENSSL_10x)\ms
+	copy /y uptable.obj  $(SRCDIR)\$(OPENSSL_10x)\ms
 
-_TARGET: $(SRCDIR)\openssl-1.0.1g\INSTALL.W32
-	cd $(SRCDIR)\openssl-1.0.1g
+_TARGET: $(SRCDIR)\$(OPENSSL_10x)\INSTALL.W32
+	cd $(SRCDIR)\$(OPENSSL_10x)
 	nmake -f $(MAKEFILE_DIR)\Makefile.win32.mak _TARGET2
 
 _TARGET2: $(TMP_D) $(INCO_D) $(BIN_D) $(LIB_D) headers lib exe
@@ -513,7 +522,11 @@ headers: $(HEADER) $(EXHEADER)
 
 lib: $(LIBS_DEP) #$(E_SHLIB)
 
+!if "$(STATIC_LIB)"!="YES"
 exe: $(BINDIR)\$(E_EXE)$(DLLSFX).exe
+!else
+exe:
+!endif
 
 install: all
 	$(MKDIR) "$(INSTALLTOP)"
@@ -562,6 +575,9 @@ $(INCL_D)\o_str.h: $(SRC_D)\crypto\o_str.h
 
 $(INCL_D)\o_dir.h: $(SRC_D)\crypto\o_dir.h
 	$(CP) "$(SRC_D)\crypto\o_dir.h" "$(INCL_D)\o_dir.h"
+
+$(INCL_D)\constant_time_locl.h: $(SRC_D)\crypto\constant_time_locl.h
+	$(CP) "$(SRC_D)\crypto\constant_time_locl.h" "$(INCL_D)\constant_time_locl.h"
 
 $(INCL_D)\md4_locl.h: $(SRC_D)\crypto\md4\md4_locl.h
 	$(CP) "$(SRC_D)\crypto\md4\md4_locl.h" "$(INCL_D)\md4_locl.h"
@@ -3445,6 +3461,7 @@ $(ENG_D)\capi.dll: $(OBJ_D)\e_capi.obj
 <<
 	IF EXIST $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
 
+!if "$(STATIC_LIB)"!="YES"
 
 $(O_SSL): $(SSLOBJ)
 	$(LINK) $(MLFLAGS) /out:$(O_SSL) /def:ms/SSLEAY32.def /implib:$(L_SSL) /pdb:$(P_SSL) @<<
@@ -3459,6 +3476,22 @@ $(O_CRYPTO): $(CRYPTOOBJ)
 <<
 	IF EXIST $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
 
+!else
+
+$(O_SSL): $(SSLOBJ)
+	$(LINK) /lib $(MLFLAGS) /out:$(O_SSL) @<<
+  $(SSLOBJ)
+<<
+	IF EXIST $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
+
+
+$(O_CRYPTO): $(CRYPTOOBJ)
+	$(LINK) /lib $(MLFLAGS) /out:$(O_CRYPTO) /pdb:$(P_CRYPTO) @<<
+  $(CRYPTOOBJ) 
+<<
+	IF EXIST $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;2
+
+!endif
 
 $(ENG_D)\gost.dll: $(GOSTOBJ)
 	$(LINK) $(MLFLAGS) /out:$(ENG_D)\gost.dll  @<<
@@ -3468,8 +3501,8 @@ $(ENG_D)\gost.dll: $(GOSTOBJ)
 
 
 $(BINDIR)\$(E_EXE)$(DLLSFX).exe: $(E_OBJ) $(LIBS_DEP)
-	$(LINK) $(LFLAGS) /out:$(BINDIR)\$(E_EXE)$(DLLSFX).exe /pdb:$(PDBDIR)\$(E_EXE)$(DLLSFX).pdb @<<
-	$(APP_EX_OBJ) $(E_OBJ) $(L_LIBS) $(EX_LIBS)
+	$(LINK) $(LFLAGS) /out:$(BINDIR)\$(E_EXE)$(DLLSFX).exe /pdb:$(PDBDIR)\$(E_EXE)$(DLLSFX).pdb $(EX_LIBS) @<<
+	$(APP_EX_OBJ) $(E_OBJ) $(L_LIBS)
 <<
 	IF EXIST $@.manifest mt -nologo -manifest $@.manifest -outputresource:$@;1
 

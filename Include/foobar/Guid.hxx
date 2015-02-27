@@ -96,11 +96,11 @@ namespace foobar
 }
 
 #define FOOBAR_DECLARE_GUID(x,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) \
-	typedef ::foobar::GuidDef<l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8> x;
+    typedef ::foobar::GuidDef<l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8> x
 
 #define FOOBAR_DECLARE_GUIDOF(x,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) \
 	template <> \
-	struct ::foobar::guid_Of_Type<x> { typedef foobar::GuidDef<l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8> Guid; };
+    struct ::foobar::guid_Of_Type<x> { typedef foobar::GuidDef<l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8> Guid; }
 
 #define FOOBAR_DECLARE_GUIDOF_(x,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) \
 	struct x; \

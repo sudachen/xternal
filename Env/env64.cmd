@@ -11,7 +11,7 @@ if .%PROCESSOR_ARCHITECTURE%. == .x86. call "%VS120COMNTOOLS%\..\..\VC\bin\x86_a
 if not .%PROCESSOR_ARCHITECTURE%. == .x86. call "%VS120COMNTOOLS%\..\..\VC\vcvarsall.bat" amd64
 
 set TARGET_CPU=X64
-set TARGET_INFIX=_64
+set TARGET_INFIX=_64r12
 
 echo %*
 %*

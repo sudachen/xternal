@@ -58,7 +58,8 @@ namespace foobar
 			enum Fetaures { NO_ARGUMENT, MAY_ARGUMENT, HAS_ARGUMENT } _fts;
 			std::shared_ptr<OptValues> _values;
 
-			bool Specified() const { return _values && (_values->specified || Count() != 0); }
+            bool Exists() const { return _values && (_values->specified || Count() != 0); }
+            bool Specified() const { return Exists(); } // compatibility with existing code
 			size_t Count() const { return _values && _values->lst.size(); }
 			operator std::string() const { return Str(); }
 			std::string Str(size_t no = 0) const
@@ -210,7 +211,7 @@ namespace foobar
 
 	struct Cmdline : std::shared_ptr<const CmdlineObject>
 	{
-		static Cmdline Parse(const char* optlist, const char* const *argv, int argc)
+        static Cmdline Parse(const char* optlist, const char* const* argv, int argc)
 		{
 			auto cmdl = std::unique_ptr<CmdlineObject>(new CmdlineObject());
 			cmdl->Initialize(optlist);
@@ -219,7 +220,7 @@ namespace foobar
 		}
 
 #ifdef _FOOBAR
-        static Cmdline Parse(const char* optlist, const wchar_t* const*argv, int argc)
+        static Cmdline Parse(const char* optlist, const wchar_t* const* argv, int argc)
         {
             std::vector<std::string> u8;
             for ( int i = 0; i < argc; ++i )

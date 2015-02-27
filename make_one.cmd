@@ -6,6 +6,8 @@ call %~dp0Env\perl_home.cmd
 call %~dp0Env\python_home.cmd
 set PATH=%~dp0Env;%SystemRoot%;%SystemRoot%\System32;%~dp0Env\gnu;%PERL_HOME%\bin;%PYTHON_HOME%
 
+if "%XTERNAL%" == "" set XTERNAL=%~dp0
+
 call %~dp0define_env.cmd 
 if exist .\define_env.cmd call define_env.cmd 
 

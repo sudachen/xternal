@@ -1,11 +1,17 @@
-@echo off 
+@echo off
 rem set MAKEIT_NAME=project name here
 rem set MAKEIT_DIR=%~dp0
+
+if "%MAKEIT_DIR%" == "" set MAKEIT_DIR=%CD%
+
 set MAKEIT_ENV=x64
+if .%PROCESSOR_ARCHITECTURE%. == .x86. set MAKEIT_ENV=x32
 set MAKEIT_REL=debug
 set MAKEIT_DEPS=NO
 set MEKEIT_PROC_DIR=%~dp0
 set MAKEIT_DYNAMIC=dll
+
+if "%OUTDIR_ROOT%" == "" set OUTDIR_ROOT=%MAKEIT_DIR%\..
 
 :next
 if .%1. == .. 		goto :build

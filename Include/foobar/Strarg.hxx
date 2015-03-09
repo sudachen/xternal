@@ -273,15 +273,15 @@ namespace foobar
 		static const size_t need_to_resolve_len = ((size_t(0) - 1) << 1)& ~have_to_delete;
 		static const size_t need_to_resolve_all = ((size_t(0) - 1) << 1 | 1)& ~have_to_delete;
 
-		template < class T >
+        template < class T >
 		Strarg(const T& any)
 		{
 			fcvt    = strarg_cvt_from(ExactType2<T, Tchr>());
 			object  = (Tchr*)&any;
 			length  = need_to_resolve_all;
-		}
+        }
 
-		Strarg(Tchr* strPtr)
+        Strarg(Tchr* strPtr)
 		{
 			fcvt      = _GetLen;
 			object    = (Tchr*)strPtr;
@@ -325,21 +325,21 @@ namespace foobar
 
 		Strarg(const std::basic_string<Tchr>& str)
 		{
-			fcvt      = 0;
+            fcvt      = nullptr;
 			object    = (Tchr*)str.c_str();
 			length    = str.length();
 		}
 
 		Strarg(const Buffer<Tchr>& str)
 		{
-			fcvt      = 0;
+            fcvt      = nullptr;
 			object    = (Tchr*)&str[0];
 			length    = str.Count();
 		}
 
 		Strarg(NoneValue)
 		{
-			fcvt      = 0;
+            fcvt      = nullptr;
 			object    = 0;
 			length    = 0;
 		}

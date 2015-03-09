@@ -65,6 +65,8 @@ namespace foobar
 		{
 			FormatString(strarg.Cstr(), strarg.Length());
 		}
+
+        virtual int Kind() = 0;
 	};
 
 	typedef std::function<void(const void* obj, FormatToolkit* toolkit)> Formatter;
@@ -84,7 +86,7 @@ namespace foobar
 			: obj(0), formatter((Formatter)nullptr)
 		{}
 
-		template <class Tchr, size_t N>
+        template <class Tchr, size_t N>
 		FormatParam(const Tchr(&str)[N])
 			: obj(&str[0]), formatter((Formatter)nullptr)
 		{
@@ -237,16 +239,26 @@ namespace foobar
 	inline Formatter select_formatter(ExactType<uint8_t>)  { return select_unsigned_formatter<uint8_t>(0); }
 	inline Formatter select_formatter(ExactType<unsigned long>) { return select_unsigned_formatter<unsigned long>(0); }
 
-	Formatter select_formatter(ExactType<void*>)
+    template <class T>
+    Formatter select_formatter(ExactType<T*>)
 	{
-		return [](const void * o, FormatToolkit * toolkit)
+        static const char* const name = typeid(T).name();
+        return [](const void * o, FormatToolkit * toolkit)
 		{
 			const void* val = *(const void**)o;
-			toolkit->FormatPointer(val);
+            if ( toolkit->Kind() == '?' )
+            {
+              std::string info = "{"+std::string(name)+"*:";
+              toolkit->FormatString(info.c_str(), info.length());
+              toolkit->FormatPointer(val);
+              toolkit->FormatString("}");
+            }
+            else
+              toolkit->FormatPointer(val);
 		};
 	}
 
-	template <class Tchr, class Otr>
+    template <class Tchr, class Otr>
 	struct WriterFormatToolkit: FormatToolkit
 	{
 		typedef typename Opposite<Tchr>::Type Ochr;
@@ -269,7 +281,9 @@ namespace foobar
 
 		WriterFormatToolkit(Otr& writer) : writer(writer) {}
 
-		void Format_Internal(
+        int Kind() { return kind; }
+
+        void Format_Internal(
 		    const Tchr* fmt,
 		    const FormatParam* const args[],
 		    size_t count)
@@ -514,9 +528,9 @@ namespace foobar
 				FormatPointer((void*)(uintptr_t)val);
 			else if (kind == 'o')
 				FormatXdigits(val, tbl_o, 3);
-			else if (kind == 'X')
+            else if (kind == 'x')
 				FormatXdigits(val, tbl_x, 4);
-			else if (kind == 'X')
+            else if (kind == 'X')
 				FormatXdigits(val, tbl_X, 4);
 			else if (kind == 'b')
 				FormatXdigits(val, tbl_b, 1);

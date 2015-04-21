@@ -39,6 +39,13 @@ in this Software without prior written authorization of the copyright holder.
 #include <algorithm>
 #include <stdexcept>
 
+#ifdef _MSC_VER
+#pragma warning(disable:4512) // sugestion to use secured _s functions
+#pragma warning(disable:4996) // swprintf ISO warning
+#pragma warning(disable:4129) // assignment operator could not be generated
+#pragma warning(disable:4239) // nonstandard extension used
+#endif
+
 #ifndef _FOOBAR
 #define _FOOBAR 0x100
 #endif
@@ -56,6 +63,19 @@ in this Software without prior written authorization of the copyright holder.
 #  define NO_INLINE  __attribute__((noinline))
 # else
 #  define NO_INLINE 
+# endif
+#endif
+
+#if defined WIN32 || defined _WIN32 || defined _MSC_VER || defined __MINGW32_VERSION
+# define __windoze
+# if !defined __i386 && !defined __x86_64
+#  ifdef _M_IX86
+#   define __i386
+#  elif defined _M_AMD64
+#   define __x86_64
+#  else
+#   error "unknown processor"
+#  endif
 # endif
 #endif
 
@@ -84,6 +104,8 @@ in this Software without prior written authorization of the copyright holder.
 #define FOOBAR_PARAM_13(_Q,n,m,l,k,j,i,g,f,e,d,c,b,a) _Q(n), FOOBAR_PARAM_12(_Q,m,l,k,j,i,g,f,e,d,c,b,a)
 #define FOOBAR_PARAM_14(_Q,o,n,m,l,k,j,i,g,f,e,d,c,b,a) _Q(o), FOOBAR_PARAM_13(_Q,n,m,l,k,j,i,g,f,e,d,c,b,a)
 #define FOOBAR_PARAM_15(_Q,p,o,n,m,l,k,j,i,g,f,e,d,c,b,a) _Q(p), FOOBAR_PARAM_14(_Q,o,n,m,l,k,j,i,g,f,e,d,c,b,a)
+
+#define NO_VTABLE __declspec(novtable)
 
 namespace foobar
 {
@@ -143,7 +165,12 @@ namespace foobar
 	template < class T >
     struct Option
 	{
-        __declspec(align(8)) uint8_t value[sizeof(T)];
+#ifdef __x86_64
+        __declspec(align(8))
+#else
+        __declspec(align(4))
+#endif
+        uint8_t value[sizeof(T)];
 		bool specified;
         Option() : specified(false) {}
         Option(NoneValue) : specified(false) {}
@@ -187,16 +214,27 @@ namespace foobar
 
 		Option& Swap(Option& o)
 		{
-            swap(value, o.value); // FIX ME!
+            for (auto i = &value[0], j = &o.value[0],
+                 iE = &value[0]+sizeof(T);
+                 i != iE; ++i, ++j)
+              std::swap(*i,*j);
+
 			std::swap(specified, o.specified);
 			return *this;
 		}
+
+        T& Get()
+        {
+            FOOBAR_ASSERT(specified != false);
+            return *(T*)&value[0];
+        }
 
         const T& Get() const
         {
             FOOBAR_ASSERT(specified != false);
             return *(T*)&value[0];
         }
+
 		typedef const T&(Option<T>::*BooleanType)() const;
 		operator BooleanType() const { return &Option<T>::Get; }
 
@@ -295,6 +333,8 @@ namespace foobar
         operator const T&() const { return Get(); }
         bool Succeeded() const { return ex == None && r != None; }
         bool Failed() const { return !Succeeded(); }
+        const T& operator->() const { return Get(); }
+        T& operator->() { return const_cast<T&>(Get()); }
     };
 
     template<class Ex>
@@ -309,7 +349,25 @@ namespace foobar
         bool Failed() const { return !Succeeded(); }
     };
 
-    typedef std::runtime_error Error;
+    //typedef std::runtime_error Error;
+
+    struct Error: std::runtime_error
+    {
+      Error(const char* text)
+        : std::runtime_error(text)
+      {}
+      Error(std::string&& text)
+        : std::runtime_error(std::move(text))
+      {}
+      Error(const std::string& text)
+        : std::runtime_error(text)
+      {}
+
+      template <class T, class E>
+      Error(const Either<T, E>& e)
+        : std::runtime_error(e.ex == None ? "none error": e.ex->what())
+      {}
+    };
 
     template <class T> struct UnVoid { typedef T Type; };
     template <> struct UnVoid<void> { typedef VoidValue Type; };
@@ -347,4 +405,5 @@ namespace foobar
     template <class T, class Ex> void operator |(const Either<T,Ex>& e, Die d) { d || e; }
 
     static const Die die = {};
+    inline void die_now(const char* text) { throw std::runtime_error(text); }
 }

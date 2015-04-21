@@ -48,7 +48,7 @@ namespace foobar
 
 		virtual void* QueryInterface(Guid const& guid)
 		{
-			if (guid == *guid_Of(this)) return this;
+            if (guid == guid_Of(this)) return this;
 			return 0;
 		}
 	};

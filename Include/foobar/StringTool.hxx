@@ -220,7 +220,7 @@ namespace foobar
 	};
 
 	template < class Tchr >
-	HexChar<Tchr> x_hex_byte(uint8_t byte, size_t pfx)
+	HexChar<Tchr> x_hex_byte(uint8_t byte, Option<char> pfx)
 	{
 		HexChar<Tchr> c = { 0, };
 		static Tchr symbols[] =
@@ -229,25 +229,26 @@ namespace foobar
 			'8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 		};
 		Tchr* q = c.chars;
-		switch (pfx & 0x7f)
-		{
-			case 'x': *q++ = '0'; *q++ = 'x'; break;
-			case '\\': *q++ = '\\'; *q++ = 'x'; break;
-			case '%': *q++ = '%'; break;
-			default: break;
-		}
+    if ( pfx != None )
+		  switch (pfx.Get() & 0x7f)
+		  {
+			  case 'x': *q++ = '0'; *q++ = 'x'; break;
+			  case '\\': *q++ = '\\'; *q++ = 'x'; break;
+			  case '%': *q++ = '%'; break;
+			  default: break;
+		  }
 		*q++ = symbols[(byte >> 4)];
 		*q++ = symbols[byte & 0x0f];
 		*q = 0;
 		return c;
 	}
 
-	inline HexChar<char> c_hex_byte(uint8_t byte, size_t pfx = 0)
+	inline HexChar<char> c_hex_byte(uint8_t byte, Option<char> pfx = None)
 	{
 		return x_hex_byte<char>(byte,pfx);
 	}
 
-	inline HexChar<wchar_t> w_hex_byte(uint8_t byte, size_t pfx = 0)
+	inline HexChar<wchar_t> w_hex_byte(uint8_t byte, Option<char> pfx = None)
 	{
 		return x_hex_byte<wchar_t>(byte,pfx);
 	}

@@ -37,6 +37,8 @@ in this Software without prior written authorization of the copyright holder.
 #error windows only!
 #endif
 
+#include "Path.hxx"
+
 namespace foobar
 {
 
@@ -51,10 +53,10 @@ namespace foobar
 		        last_error,
 		        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 		        &buff[0],
-		        buff.size() - 1,
+		        (DWORD)(buff.size() - 1),
 		        NULL
 		    );
-		auto E = std::remove(buff.begin(),buff.end(),'\n');
+		auto E = std::remove(buff.begin(),buff.begin()+len,'\n');
 		E = std::remove(buff.begin(),E,'\r');
 		return std::wstring(buff.begin(),E);
 	}
@@ -64,5 +66,46 @@ namespace foobar
 		return format_win32_error(GetLastError());
 	}
 
+    inline Path<wchar_t> get_executable_path()
+    {
+      std::vector<wchar_t> exe_path(260);
+      for(;;) {
+        ::GetModuleFileNameW(0,&exe_path[0],(DWORD)exe_path.size());
+        if ( GetLastError() != ERROR_INSUFFICIENT_BUFFER )
+          break;
+        exe_path.resize(exe_path.size()*2);
+      }
+      return Path<wchar_t>(&exe_path[0]).Fullpath();
+    }
+
+    inline std::wstring get_executable_name()
+    {
+      return get_executable_path().Name();
+    }
+
+
+    inline const OSVERSIONINFOW& get_windows_version_info()
+    {
+      static OSVERSIONINFOW nfo = {0,};
+      if ( nfo.dwOSVersionInfoSize == 0 )
+      {
+        nfo.dwOSVersionInfoSize = sizeof(nfo);
+        ::GetVersionExW(&nfo);
+      }
+      return nfo;
+    }
+
+    inline size_t windows_version()
+    {
+      const OSVERSIONINFOW& nfo = get_windows_version_info();
+      return nfo.dwMajorVersion * 100
+          +  nfo.dwMinorVersion;
+    }
+
+    const size_t WINDOWS81_VERSION    = 603;
+    const size_t SERVER2012R2_VERSION = 603;
+    const size_t WINDOWS8_VERSION     = 602;
+    const size_t WINDOWS7_VERSION     = 601;
+    const size_t WINDOWSVISTA_VERSION = 600;
 }
 

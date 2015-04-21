@@ -103,7 +103,8 @@ namespace foobar
 						return false;
 				}
 			}
-			*o = c; ++o;
+
+			*o++ = (wchar_t)c;
 		}
 		return true;
 	}

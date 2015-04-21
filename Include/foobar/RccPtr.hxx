@@ -170,6 +170,12 @@ namespace foobar
 			swap(p.ref_, ref_);
 		}
 
+        template< class... Args >
+        static RccPtr Make( Args&&... args )
+        {
+          return RccPtr(new T(std::forward<Args>(args)...));
+        }
+
 	private:
 		void operator=(const T*);
 	};
@@ -222,5 +228,6 @@ namespace foobar
 	{
 		return !ptr.Get();
 	}
+
 }
 

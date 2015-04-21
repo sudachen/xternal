@@ -110,7 +110,7 @@ namespace foobar
 				return None;
 #ifdef _WIN32
 			std::array<wchar_t, 260> tmp;
-			DWORD r = GetFullPathNameW(Strarg<wchar_t>(path).Cstr(), tmp.size(), &tmp[0], 0);
+			DWORD r = GetFullPathNameW(Strarg<wchar_t>(path).Cstr(), (DWORD)tmp.size(), &tmp[0], 0);
 			assert(r < tmp.size());
 			return Path<Tchr>(&tmp[0]);
 #else

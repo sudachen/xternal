@@ -149,7 +149,7 @@ namespace foobar
 			});
 		}
 
-		void Parse(const char* const *argv, int argc, unsigned flags = 0)
+		void Parse(const char* const *argv, int argc, unsigned /*flags*/ = 0)
 		{
 			std::array<char, 128> bf;
 			for (int arg_no = 1; arg_no < argc; ++arg_no)

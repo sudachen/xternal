@@ -32,12 +32,7 @@ in this Software without prior written authorization of the copyright holder.
 #include "Common.hxx"
 #include "Cmdline.hxx"
 #include "Strarg.hxx"
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#error windows only!
-#endif
+#include "Win32.hxx"
 
 namespace foobar
 {

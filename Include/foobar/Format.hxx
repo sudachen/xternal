@@ -139,7 +139,7 @@ namespace foobar
 	}
 
 	template <class Tchr>
-	Formatter select_formatter(ExactType<std::basic_string<Tchr>>&)
+	Formatter select_formatter(ExactType<std::basic_string<Tchr>>)
 	{
 		return [](const void * o, FormatToolkit * toolkit)
 		{
@@ -148,7 +148,7 @@ namespace foobar
 		};
 	}
 
-	Formatter select_formatter(ExactType<std::vector<char>>&)
+	Formatter select_formatter(ExactType<std::vector<char>>)
 	{
 		return [](const void * o, FormatToolkit * toolkit)
 		{
@@ -157,7 +157,7 @@ namespace foobar
 		};
 	}
 
-	Formatter select_formatter(ExactType<std::vector<wchar_t>>&)
+	Formatter select_formatter(ExactType<std::vector<wchar_t>>)
 	{
 		return [](const void * o, FormatToolkit * toolkit)
 		{
@@ -166,7 +166,7 @@ namespace foobar
 		};
 	}
 
-	Formatter select_formatter(ExactType<Buffer<char>>&)
+	Formatter select_formatter(ExactType<Buffer<char>>)
 	{
 		return [](const void * o, FormatToolkit * toolkit)
 		{
@@ -175,7 +175,7 @@ namespace foobar
 		};
 	}
 
-	Formatter select_formatter(ExactType<Buffer<wchar_t>>&)
+	Formatter select_formatter(ExactType<Buffer<wchar_t>>)
 	{
 		return [](const void * o, FormatToolkit * toolkit)
 		{
@@ -330,6 +330,7 @@ namespace foobar
 							case (Tchr)'d': case 'u': case 'i':
 							case (Tchr)'f': case 'e': case 'g':
 							case (Tchr)'p': case 's': case 'S':
+              case (Tchr)'c':
 								kind = uint8_t(*fmt++); break;
 							default:
 								if (isdigit((char)*fmt))
@@ -422,7 +423,7 @@ namespace foobar
 		template <class Tc>
 		void FormatAjusted(const Tc* chars, size_t chars_count)
 		{
-			int count = chars_count;
+			int count = (int)chars_count;
 			int quote_width = (quote_left ? 1 : 0) + (quote_right ? 1 : 0);
 			if (align == ALIGN_LEFT)
 			{
@@ -454,7 +455,7 @@ namespace foobar
 
 			if (val)
 			{
-				for (unsigned int v = val; v > 0;)
+				for (uint64_t v = val; v > 0;)
 				{
 					FOOBAR_ASSERT(i > 1);
 					foo[--i] = symbols[ v & mask ];
@@ -496,6 +497,13 @@ namespace foobar
 				p[--i] = '0';
 		}
 
+    void FormatChar(uint64_t val)
+    {
+      char c[2] = {'.',0};
+      if ( val >= 20 && val < 127 ) c[0] = (char)val;
+      FormatAjusted(c,1);
+    }
+
 		void FormatDigits(uint64_t val, bool negative)
 		{
 			std::array<Tchr, 128> p = {0};
@@ -509,7 +517,7 @@ namespace foobar
 
 		void FormatSigned(int64_t val, size_t width) OVERRIDE
 		{
-			if (kind == 'x' || kind == 'X' || kind == 'b' || kind == 'o' || kind != 'p' || kind != 'u')
+			if (kind == 'x' || kind == 'X' || kind == 'b' || kind == 'o' || kind == 'p' || kind == 'u' || kind == 'c')
 			{
 				uint64_t mask = ~(0 - (uint64_t(1) << width));
 				FormatUnsigned((uint64_t)val & mask);
@@ -534,6 +542,8 @@ namespace foobar
 				FormatXdigits(val, tbl_X, 4);
 			else if (kind == 'b')
 				FormatXdigits(val, tbl_b, 1);
+			else if (kind == 'c')
+				FormatChar(val);
 			else
 				FormatDigits(val, false);
 		}

@@ -29,6 +29,8 @@ in this Software without prior written authorization of the copyright holder.
 
 #pragma once
 
+#include "Common.hxx"
+
 #if !defined _WIN32 && !defined FOOBAR_REUSE_GUID
 
 typedef struct GUID
@@ -45,7 +47,12 @@ typedef struct GUID
 
 namespace foobar
 {
-	struct Guid { GUID value; };
+    struct Guid
+    {
+      GUID value;
+      operator const GUID&() const { return value; }
+      operator GUID&() { return value; }
+    };
 
 	template < class T >
 	struct guid_Of_Type
@@ -54,10 +61,10 @@ namespace foobar
 	};
 
 	template < class T > inline
-	Guid const* guid_Of(T const* /*fake*/ = 0)
+    GUID const& guid_Of(T const* /*fake*/ = 0)
 	{
 		typedef typename guid_Of_Type<T>::Guid Guid;
-		return &Guid::value;
+        return Guid::value.value;
 	}
 
 	template < unsigned tLx,
@@ -93,6 +100,26 @@ namespace foobar
 	{
 		return guid_cmpf(&a, &b) == 0;
 	}
+
+    inline std::string to_string(const GUID& guid)
+    {
+      std::array<char,48> bf;
+      sprintf(&bf[0],"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+          guid.Data1,guid.Data2,guid.Data3,
+          guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],
+          guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+      return std::string(&bf[0]);
+    }
+
+    inline std::wstring to_wstring(const GUID& guid)
+    {
+      std::array<wchar_t,48> bf;
+      swprintf(&bf[0],L"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+          guid.Data1,guid.Data2,guid.Data3,
+          guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],
+          guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+      return std::wstring(&bf[0]);
+    }
 }
 
 #define FOOBAR_DECLARE_GUID(x,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) \
@@ -106,5 +133,5 @@ namespace foobar
 	struct x; \
 	FOOBAR_DECLARE_GUIDOF(x,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8)
 
-#define FOOBAR_GUIDOF_(x) ::foobar::guid_Of_type<x>::Guid::value
-#define FOOBAR_GUIDOF(x) (*guid_Of((x*)0))
+#define FOOBAR_GUIDOF_(x) ::foobar::guid_Of_Type<x>::Guid
+#define FOOBAR_GUIDOF(x)  ::foobar::guid_Of<x>()

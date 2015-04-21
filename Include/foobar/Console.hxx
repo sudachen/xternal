@@ -150,4 +150,26 @@ namespace foobar
 		const FormatParam* const args[] = {&a0, &a1, &a2, &a3, &a4, &a5, &a6, &a7, &a8, &a9};
 		return println_to_console(fmt.Cstr(), args, sizeof(args) / sizeof(args[0]));
 	}
+
+	inline void println( const Strarg<wchar_t>& fmt,
+		const FormatParam& a0,
+		const FormatParam& a1,
+		const FormatParam& a2,
+		const FormatParam& a3,
+		const FormatParam& a4,
+		const FormatParam& a5,
+		const FormatParam& a6,
+		const FormatParam& a7,
+		const FormatParam& a8,
+		const FormatParam& a9,
+		const FormatParam& aA = None,
+		const FormatParam& aB = None,
+		const FormatParam& aC = None,
+		const FormatParam& aD = None,
+		const FormatParam& aE = None,
+		const FormatParam& aF = None)
+	{
+		const FormatParam* const args[] = {&a0, &a1, &a2, &a3, &a4, &a5, &a6, &a7, &a8, &a9, &aA, &aB, &aC, &aD, &aE, &aF};
+		return println_to_console(fmt.Cstr(), args, sizeof(args) / sizeof(args[0]));
+	}
 }

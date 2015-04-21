@@ -81,14 +81,21 @@ namespace foobar
 
 		virtual bool Rewind()
 		{
-			if (ClaimFeature(CAN_SEEK)) return Seek(0);
+			if (ClaimFeature(CAN_SEEK)) 
+      {
+        Seek(0);
+        return Good();
+      }
 			return false;
 		}
 
 		virtual bool Skip(int64_t count)
 		{
 			if (Features() && CAN_SEEK)
-				return Seek(count, SEEK_CUR);
+      {
+				Seek(count, SEEK_CUR);
+        return Good();
+      }
 			else
 			{
 				uint8_t bf[512];
@@ -107,8 +114,10 @@ namespace foobar
 
 		bool ClaimFeature(unsigned feature)
 		{
-			if (Features() & feature != feature)
+			if ( (Features() & feature) != feature)
+      {
 				return Error("claimed unsupported feature");
+      }
 			return true;
 		}
 
@@ -186,7 +195,7 @@ namespace foobar
 			if ( text != None )
 				if ( Write(text.Cstr(),text.Length()) != text.Length() ) 
 					return -1;
-			return text.Length();
+			return (int)text.Length();
 		}
 
 		NO_INLINE int WriteLine(const Strarg<char>& text = None)
@@ -196,10 +205,10 @@ namespace foobar
 					return -1;
 #ifdef _WIN32
 			if ( Write("\r\n",2) != 2 ) return -1;
-			return text.Length() + 2;
+			return (int)(text.Length() + 2);
 #else
 			if ( Write("\n",1) != 1 ) return -1;
-			return text.Length() + 1;
+			return (int)(text.Length() + 1);
 #endif
 		}
 
@@ -571,7 +580,7 @@ namespace foobar
 		{
 			if (ClaimOperable() && ClaimFeature(CAN_SEEK))
 			{
-				int64_t npos = api->f_seek(fd, 0, whence);
+				int64_t npos = api->f_seek(fd, pos, whence);
 				if (npos < 0)
 					return Error("failed to seek to new position"), -1;
 				return npos;
@@ -635,7 +644,7 @@ namespace foobar
 					return Error("failed to write"), -1;
 			}
 			
-			return min_count + wrote;
+			return (int)(min_count + wrote);
 		}
 
 		int ReadData(void* buf, size_t count, size_t min_count) OVERRIDE
@@ -672,7 +681,7 @@ namespace foobar
 					break;
 			}
 
-			return i;
+			return (int)i;
 		}
 
 		unsigned Features() OVERRIDE

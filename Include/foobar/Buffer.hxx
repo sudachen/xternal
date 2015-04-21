@@ -212,11 +212,14 @@ namespace foobar
 	template < class T >
 	struct BufferInserter
 	{
-        Buffer<T>& bf;
+    Buffer<T>& bf;
 
-        explicit BufferInserter(Buffer<T>& bf)
-            : bf(bf)
+    explicit BufferInserter(Buffer<T>& bf)
+        : bf(bf)
 		{}
+
+    BufferInserter(BufferInserter& bi) : bf(bi.bf)
+    {}
 
 		BufferInserter& operator ++() { return *this; }
 		BufferInserter& operator ++(int) { return *this; }
@@ -229,6 +232,7 @@ namespace foobar
 
 		bool operator ==(const BufferInserter&){ return false; }
 		bool operator !=(const BufferInserter&){ return true; }
+
 	};
 
 	template < class T > 

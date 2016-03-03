@@ -1,5 +1,10 @@
 
-.SUFFIXES: .c .cc .cxx .obj .lib .dll .exe .S
+.SUFFIXES: .c .cc .cxx .obj .lib .dll .exe .S .txt
+
+xEXE = .exe
+xDLL = .dll
+XOBJ = .obj
+XPDB = .pdb
 
 !if "$(WORKSPACE)" == ""
 WORKSPACE=UNKNOWN
@@ -178,11 +183,13 @@ METALINK=$(DLLLINK) /pdb:$(PDBNAME) /implib:$(LIBNAME) /out:$(DLLNAME)
 TARGET=$(TARGETNAME)
 !endif
 
-build:  $(OBJDIR) $(BINDIR) $(LIBDIR) $(PDBDIR) $(TARGET)
-rebuild: $(OBJDIR) $(BINDIR) $(LIBDIR) $(PDBDIR) clean $(TARGET)
+TSTDIR = $(OUTDIR_ROOT)\~$(CONFIG)\.$(PROJECT)$(LIBSFX)
 
-$(OBJDIR) $(LIBDIR) $(BINDIR) $(PDBDIR):
-	if not exist $@ md $@
+build:  $(OBJDIR) $(BINDIR) $(LIBDIR) $(PDBDIR) $(TSTDIR) $(TARGET)
+rebuild: $(OBJDIR) $(BINDIR) $(LIBDIR) $(PDBDIR) $(TSTDIR) clean $(TARGET)
+
+$(OBJDIR) $(LIBDIR) $(BINDIR) $(PDBDIR) $(TSTDIR):
+	@if not exist $@ md $@
 
 info:
 	@echo --------------------------------------------

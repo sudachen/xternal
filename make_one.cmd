@@ -21,6 +21,7 @@ set PROJECT=%1
 shift
 
 if .%PROJECT%. == .. goto :eof
+if not .%PROJECT_DIR%. == .. goto :next_arg
 set PROJECT_DIR=%PROJECT%
 if not exist %PROJECT_DIR% set PROJECT_DIR=%PROJECT%.SRC
 if not exist %PROJECT_DIR% goto :eof

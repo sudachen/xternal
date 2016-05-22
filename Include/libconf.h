@@ -1,1 +1,1 @@
-#include "../xternal/libconf/include/libconf.h"
+#include "../libconf/include/libconf.h"

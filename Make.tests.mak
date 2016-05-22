@@ -9,7 +9,7 @@ unpack: $(SRCDIR)\README
 $(SRCDIR)\README:
 	@7z x -o$(SRCDIR) "$(SOURCE_ZIP)"
 
-$(TARGETNAME): $(UNPACK) $(TESTS)
+$(TARGETNAME): $(TSTDIR) $(UNPACK) $(TESTS)
 
 {$(SRCDIR)}.c{$(TSTDIR)}.exe:
 	$(CC) -c $(CCFLAGS) $(DLL_OPTS) $(INCL) -Fo$*.obj $<
@@ -19,5 +19,5 @@ $(TARGETNAME): $(UNPACK) $(TESTS)
 {$(SRCDIR)}.txt{$(TSTDIR)}.txt:
 	copy "$<" "$@"
 
-clean:
+clean: $(TSTDIR)
 	-del $(TESTS) $(TESTS:.exe=.pdb) $(TESTS:.exe=.obj)

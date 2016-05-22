@@ -25,6 +25,7 @@ if not .%PROJECT_DIR%. == .. goto :next_arg
 set PROJECT_DIR=%PROJECT%
 if not exist %PROJECT_DIR% set PROJECT_DIR=%PROJECT%.SRC
 if not exist %PROJECT_DIR% goto :eof
+if .%MSRT%. == .. set MSRT=_120
 
 :next_arg
 if .%1. == .. 		goto :no_more
@@ -37,6 +38,9 @@ if .%1. == .static.  	set STATIC_SET=YES
 if .%1. == .dynamic. 	set STATIC_SET=NO
 if .%1. == .dll.     	set STATIC_SET=NO
 if .%1. == .monodll. 	set STATIC_SET=YENO
+if .%1. == .rt140.  	set MSRT=_140
+if .%1. == .rt120.  	set MSRT=_120
+if .%1. == .rt100.  	set MSRT=_100
 if .%1. == .x64.  	set ENVIRONS=env64
 if .%1. == .x86.  	set ENVIRONS=env32
 if .%1. == .x*.  	set ENVIRONS=env32 env64
@@ -55,7 +59,7 @@ for %%n in (%ENVIRONS%) do (
 				echo %PROJECT%
           			set DEBUG=%%d
           			set STATIC=%%s
-          			cmd /c %%n %MAKEDIR%build_target.cmd %ACTION%
+          			cmd /c %%n%MSRT% %MAKEDIR%build_target.cmd %ACTION%
 				if errorlevel 1 exit 1
 			)
 		)

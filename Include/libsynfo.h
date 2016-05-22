@@ -1,2 +1,2 @@
-#include "../xternal/libsynfo/include/libsynfo.h"
+#include "../libsynfo/include/libsynfo.h"
 

@@ -35,22 +35,22 @@ in this Software without prior written authorization of the copyright holder.
 
 namespace foobar
 {
-#ifdef _WIN32
-	namespace interlocked
-	{
-		inline long inc(long volatile &value)
-		{
-			return _InterlockedIncrement(&value);
-		}
-		inline long dec(long volatile &value)
-		{
-			return _InterlockedDecrement(&value);
-		}
-	}
-#else
-	namespace interlocked
-	{
-	}
-#endif
+    #ifdef _WIN32
+    namespace interlocked
+    {
+        inline long inc(long volatile& value)
+        {
+            return _InterlockedIncrement(&value);
+        }
+        inline long dec(long volatile& value)
+        {
+            return _InterlockedDecrement(&value);
+        }
+    }
+    #else
+    namespace interlocked
+    {
+    }
+    #endif
 }
 

@@ -36,61 +36,61 @@ in this Software without prior written authorization of the copyright holder.
 
 namespace foobar
 {
-	FOOBAR_DECLARE_GUIDOF_(Ireferred, 0xcafebabe, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8);
+    FOOBAR_DECLARE_GUIDOF_(Ireferred, 0xcafebabe, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8);
 
-	struct Ireferred
-	{
-		void Release() const { const_cast<Ireferred*>(this)->Release(); }
-		void AddRef() const { const_cast<Ireferred*>(this)->AddRef(); }
-		virtual void Release() = 0;
-		virtual void AddRef() = 0;
-		virtual ~Ireferred() { }
+    struct Ireferred
+    {
+        void Release() const { const_cast<Ireferred*>(this)->Release(); }
+        void AddRef() const { const_cast<Ireferred*>(this)->AddRef(); }
+        virtual void Release() = 0;
+        virtual void AddRef() = 0;
+        virtual ~Ireferred() { }
 
-		virtual void* QueryInterface(Guid const& guid)
-		{
+        virtual void* QueryInterface(Guid const& guid)
+        {
             if (guid == guid_Of(this)) return this;
-			return 0;
-		}
-	};
+            return 0;
+        }
+    };
 
-	template < class T = Ireferred >
-	struct RefcountedT : NonCopyableT<T>
-	{
-		void Release() OVERRIDE
-		{
-			FOOBAR_ASSERT(refcount > 0);
-			if (!interlocked::dec(refcount))
-				delete this;
-		}
+    template <class T = Ireferred>
+    struct RefcountedT : NonCopyableT<T>
+    {
+        void Release() OVERRIDE
+        {
+            FOOBAR_ASSERT(refcount > 0);
+            if (!interlocked::dec(refcount))
+                delete this;
+        }
 
-		void AddRef() OVERRIDE
-		{
-			FOOBAR_ASSERT(refcount > 0);
-			interlocked::inc(refcount);
-		}
+        void AddRef() OVERRIDE
+        {
+            FOOBAR_ASSERT(refcount > 0);
+            interlocked::inc(refcount);
+        }
 
-		RefcountedT() : refcount(1) { }
+        RefcountedT() : refcount(1) { }
 
-		long Refcount()
-		{
-			return refcount;
-		}
+        long Refcount()
+        {
+            return refcount;
+        }
 
-	protected:
-		~RefcountedT() { }
+    protected:
+        ~RefcountedT() { }
 
-	private:
-		volatile long refcount;
-	};
+    private:
+        volatile long refcount;
+    };
 
-	typedef RefcountedT<> Refcounted;
+    typedef RefcountedT<> Refcounted;
 
-	template < class T >
-	RccPtr<T> rcc_cast(RccPtr<Ireferred> const& p)
-	{
-		return p
-		       ? rcc_refe((T*)p->QueryInterface(*guid_Of((T*)0)))
-		       : RccPtr<T> (0);
-	}
+    template <class T>
+    RccPtr<T> rcc_cast(RccPtr<Ireferred> const& p)
+    {
+        return p
+               ? rcc_refe((T*)p->QueryInterface(*guid_Of((T*)0)))
+               : RccPtr<T> (0);
+    }
 
 }

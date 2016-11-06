@@ -35,10 +35,10 @@ in this Software without prior written authorization of the copyright holder.
 
 typedef struct GUID
 {
-	u32_t Data1;
-	u16_t Data2;
-	u16_t Data3;
-	byte_t Data4[8];
+    u32_t Data1;
+    u16_t Data2;
+    u16_t Data3;
+    byte_t Data4[8];
 } GUID;
 
 #elif defined _WIN32
@@ -49,76 +49,76 @@ namespace foobar
 {
     struct Guid
     {
-      GUID value;
-      operator const GUID&() const { return value; }
-      operator GUID&() { return value; }
+        GUID value;
+        operator const GUID& () const { return value; }
+        operator GUID& () { return value; }
     };
 
-	template < class T >
-	struct guid_Of_Type
-	{
-		typedef typename T::Guid Guid;
-	};
+    template <class T>
+    struct guid_Of_Type
+    {
+        typedef typename T::Guid Guid;
+    };
 
-	template < class T > inline
+    template <class T> inline
     GUID const& guid_Of(T const* /*fake*/ = 0)
-	{
-		typedef typename guid_Of_Type<T>::Guid Guid;
+    {
+        typedef typename guid_Of_Type<T>::Guid Guid;
         return Guid::value.value;
-	}
+    }
 
-	template < unsigned tLx,
-	         unsigned tWx1, unsigned tWx2,
-	         unsigned tBx1, unsigned tBx2, unsigned tBx3, unsigned tBx4,
-	         unsigned tBx5, unsigned tBx6, unsigned tBx7, unsigned tBx8 >
-	struct GuidDef
-	{
-		static Guid const value;
-	};
+    template <unsigned tLx,
+              unsigned tWx1, unsigned tWx2,
+              unsigned tBx1, unsigned tBx2, unsigned tBx3, unsigned tBx4,
+              unsigned tBx5, unsigned tBx6, unsigned tBx7, unsigned tBx8>
+    struct GuidDef
+    {
+        static Guid const value;
+    };
 
-	template < unsigned tLx,
-	         unsigned tWx1, unsigned tWx2,
-	         unsigned tBx1, unsigned tBx2, unsigned tBx3, unsigned tBx4,
-	         unsigned tBx5, unsigned tBx6, unsigned tBx7, unsigned tBx8 >
-	Guid const GuidDef <tLx, tWx1, tWx2, tBx1, tBx2, tBx3, tBx4, tBx5, tBx6, tBx7, tBx8>
-	::value = { tLx, tWx1, tWx2, { tBx1, tBx2, tBx3, tBx4, tBx5, tBx6, tBx7, tBx8 } };
+    template <unsigned tLx,
+              unsigned tWx1, unsigned tWx2,
+              unsigned tBx1, unsigned tBx2, unsigned tBx3, unsigned tBx4,
+              unsigned tBx5, unsigned tBx6, unsigned tBx7, unsigned tBx8>
+    Guid const GuidDef <tLx, tWx1, tWx2, tBx1, tBx2, tBx3, tBx4, tBx5, tBx6, tBx7, tBx8>
+    ::value = { tLx, tWx1, tWx2, { tBx1, tBx2, tBx3, tBx4, tBx5, tBx6, tBx7, tBx8 } };
 
-	struct GuidLesser
-	{
-		bool operator()(Guid const& a, Guid const& b) const
-		{
-			return memcmp(&a, &b, sizeof(Guid)) < 0;
-		}
-	};
+    struct GuidLesser
+    {
+        bool operator()(Guid const& a, Guid const& b) const
+        {
+            return memcmp(&a, &b, sizeof(Guid)) < 0;
+        }
+    };
 
-	inline int guid_cmpf(void const* a, void const* b)
-	{
-		return memcmp(a, b, sizeof(Guid));
-	}
+    inline int guid_cmpf(void const* a, void const* b)
+    {
+        return memcmp(a, b, sizeof(Guid));
+    }
 
-	inline bool operator ==(Guid const& a, Guid const& b)
-	{
-		return guid_cmpf(&a, &b) == 0;
-	}
+    inline bool operator ==(Guid const& a, Guid const& b)
+    {
+        return guid_cmpf(&a, &b) == 0;
+    }
 
     inline std::string to_string(const GUID& guid)
     {
-      std::array<char,48> bf;
-      sprintf(&bf[0],"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-          guid.Data1,guid.Data2,guid.Data3,
-          guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],
-          guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
-      return std::string(&bf[0]);
+        std::array<char,48> bf;
+        sprintf(&bf[0],"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+                guid.Data1,guid.Data2,guid.Data3,
+                guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],
+                guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+        return std::string(&bf[0]);
     }
 
     inline std::wstring to_wstring(const GUID& guid)
     {
-      std::array<wchar_t,48> bf;
-      swprintf(&bf[0],L"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-          guid.Data1,guid.Data2,guid.Data3,
-          guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],
-          guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
-      return std::wstring(&bf[0]);
+        std::array<wchar_t,48> bf;
+        swprintf(&bf[0],L"%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+                 guid.Data1,guid.Data2,guid.Data3,
+                 guid.Data4[0],guid.Data4[1],guid.Data4[2],guid.Data4[3],
+                 guid.Data4[4],guid.Data4[5],guid.Data4[6],guid.Data4[7]);
+        return std::wstring(&bf[0]);
     }
 }
 
@@ -126,12 +126,12 @@ namespace foobar
     typedef ::foobar::GuidDef<l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8> x
 
 #define FOOBAR_DECLARE_GUIDOF(x,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) \
-	template <> \
+    template <> \
     struct ::foobar::guid_Of_Type<x> { typedef foobar::GuidDef<l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8> Guid; }
 
 #define FOOBAR_DECLARE_GUIDOF_(x,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) \
-	struct x; \
-	FOOBAR_DECLARE_GUIDOF(x,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8)
+    struct x; \
+    FOOBAR_DECLARE_GUIDOF(x,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8)
 
 #define FOOBAR_GUIDOF_(x) ::foobar::guid_Of_Type<x>::Guid
 #define FOOBAR_GUIDOF(x)  ::foobar::guid_Of<x>()

@@ -34,200 +34,200 @@ in this Software without prior written authorization of the copyright holder.
 
 namespace foobar
 {
-	template < class T > inline T* refe(T* ref)
-	{
-		if ( ref ) ref->AddRef();
-		return ref;
-	}
+    template <class T> inline T* refe(T* ref)
+    {
+        if ( ref ) ref->AddRef();
+        return ref;
+    }
 
-	template < class T > inline void unrefe(T*& ref)
-	{
-		if ( ref ) ref->Release();
-		ref = 0;
-	}
+    template <class T> inline void unrefe(T*& ref)
+    {
+        if ( ref ) ref->Release();
+        ref = 0;
+    }
 
-	template < class T >
-	struct RccPtr
-	{
-		mutable T* ref_;
+    template <class T>
+    struct RccPtr
+    {
+        mutable T* ref_;
 
-		typedef RccPtr<T> const& Ref;
+        typedef RccPtr<T> const& Ref;
 
-		explicit RccPtr(T* t = 0)
-			: ref_(t) { }
+        explicit RccPtr(T* t = 0)
+            : ref_(t) { }
 
-		explicit RccPtr(T* t, bool addref)
-			: ref_(t)
-		{
-			if (addref)
-				refe(ref_);
-		}
-
-		RccPtr(struct NoneValue)
-			: ref_(0) { }
-
-		RccPtr(struct NewValue)
-			: ref_(new T()) { }
-
-		RccPtr(const RccPtr<T>& a)
-		{
-			ref_ = refe(a.ref_);
-		}
-
-		~RccPtr()
-		{
-			unrefe(ref_);
-		}
-
-		template < class Q > operator RccPtr<Q> () const
-		{
-			return RccPtr<Q> (refe(ref_));
-		}
-
-		bool operator !() const
-		{
-			return !ref_;
-		}
-
-		typedef T* (RccPtr<T>::*BoolType)();
-
-		operator BoolType() const
-		{
-			return ref_ != 0 ? &RccPtr<T>::Forget : 0;
-		}
-
-		T& operator *() const
-		{
-			return *ref_;
-		}
-
-		T* operator -> () const
-		{
-			return ref_;
-		}
-
-		const RccPtr& operator=(const RccPtr& a)
-		{
-			Reset(refe(a.ref_));
-			return *this;
-		}
-
-		bool operator ==(NoneValue) const
-		{
-			return ref_ == 0;
-		}
-
-		bool operator ==(const RccPtr& a) const
-		{
-			return ref_ == a.ref_;
-		}
-
-		bool operator !=(NoneValue) const
-		{
-			return ref_ != 0;
-		}
-
-		bool operator !=(const RccPtr& a) const
-		{
-			return ref_ != a.ref_;
-		}
-
-		bool operator<(const RccPtr& a) const
-		{
-			return ref_ < a.ref_;
-		}
-
-		bool operator>(const RccPtr& a) const
-		{
-			return ref_ > a.ref_;
-		}
-
-		T*& operator +() const
-		{
-			return ref_;
-		}
-
-		T* Get() const
-		{
-			return ref_;
-		}
-
-		void Reset(T* t)
-		{
-			unrefe(ref_);
-			ref_ = t;
-		}
-
-		T* Forget()
-		{
-			T* t = ref_;
-			ref_ = 0;
-			return t;
-		}
-
-		void Swap(RccPtr& p)
-		{
-			swap(p.ref_, ref_);
-		}
-
-        template< class... Args >
-        static RccPtr Make( Args&&... args )
+        explicit RccPtr(T* t, bool addref)
+            : ref_(t)
         {
-          return RccPtr(new T(std::forward<Args>(args)...));
+            if (addref)
+                refe(ref_);
         }
 
-	private:
-		void operator=(const T*);
-	};
+        RccPtr(struct NoneValue)
+            : ref_(0) { }
 
-	template < class T > inline
-	T* refe(const RccPtr<T>& ref)
-	{
-		refe(ref.ref_);
-		return ref.ref_;
-	}
+        RccPtr(struct NewValue)
+            : ref_(new T()) { }
 
-	template < class T > inline
-	void unrefe(RccPtr<T>& ref)
-	{
-		ref.Reset((T*)0);
-	}
+        RccPtr(const RccPtr<T>& a)
+        {
+            ref_ = refe(a.ref_);
+        }
 
-	template < class T > inline
-	T* forget(RccPtr<T>& ref)
-	{
-		return ref.Forget();
-	}
+        ~RccPtr()
+        {
+            unrefe(ref_);
+        }
 
-	template < class T > inline
-	void reset(RccPtr<T>& ref, T* p)
-	{
-		ref.Reset(p);
-	}
+        template <class Q> operator RccPtr<Q> () const
+        {
+            return RccPtr<Q> (refe(ref_));
+        }
 
-	template < class T > inline
-	RccPtr<T> rcc_ptr(T* ref)
-	{
-		return RccPtr<T> (ref);
-	}
+        bool operator !() const
+        {
+            return !ref_;
+        }
 
-	template < class T > inline
-	RccPtr<T> rcc_refe(T* ref)
-	{
-		return RccPtr<T> (refe(ref));
-	}
+        typedef T* (RccPtr<T>::*BoolType)();
 
-	template < class T > inline
-	void swap(RccPtr<T>& to, RccPtr<T>& from)
-	{
-		to.Swap(from);
-	}
+        operator BoolType() const
+        {
+            return ref_ != 0 ? &RccPtr<T>::Forget : 0;
+        }
 
-	template < class T> inline 
-	bool is_null(const RccPtr<T>& ptr)
-	{
-		return !ptr.Get();
-	}
+        T& operator *() const
+        {
+            return *ref_;
+        }
+
+        T* operator -> () const
+        {
+            return ref_;
+        }
+
+        const RccPtr& operator=(const RccPtr& a)
+        {
+            Reset(refe(a.ref_));
+            return *this;
+        }
+
+        bool operator ==(NoneValue) const
+        {
+            return ref_ == 0;
+        }
+
+        bool operator ==(const RccPtr& a) const
+        {
+            return ref_ == a.ref_;
+        }
+
+        bool operator !=(NoneValue) const
+        {
+            return ref_ != 0;
+        }
+
+        bool operator !=(const RccPtr& a) const
+        {
+            return ref_ != a.ref_;
+        }
+
+        bool operator<(const RccPtr& a) const
+        {
+            return ref_ < a.ref_;
+        }
+
+        bool operator>(const RccPtr& a) const
+        {
+            return ref_ > a.ref_;
+        }
+
+        T*& operator +() const
+        {
+            return ref_;
+        }
+
+        T* Get() const
+        {
+            return ref_;
+        }
+
+        void Reset(T* t)
+        {
+            unrefe(ref_);
+            ref_ = t;
+        }
+
+        T* Forget()
+        {
+            T* t = ref_;
+            ref_ = 0;
+            return t;
+        }
+
+        void Swap(RccPtr& p)
+        {
+            swap(p.ref_, ref_);
+        }
+
+        template<class... Args>
+        static RccPtr Make( Args&& ... args )
+        {
+            return RccPtr(new T(std::forward<Args>(args)...));
+        }
+
+    private:
+        void operator=(const T*);
+    };
+
+    template <class T> inline
+    T* refe(const RccPtr<T>& ref)
+    {
+        refe(ref.ref_);
+        return ref.ref_;
+    }
+
+    template <class T> inline
+    void unrefe(RccPtr<T>& ref)
+    {
+        ref.Reset((T*)0);
+    }
+
+    template <class T> inline
+    T* forget(RccPtr<T>& ref)
+    {
+        return ref.Forget();
+    }
+
+    template <class T> inline
+    void reset(RccPtr<T>& ref, T* p)
+    {
+        ref.Reset(p);
+    }
+
+    template <class T> inline
+    RccPtr<T> rcc_ptr(T* ref)
+    {
+        return RccPtr<T> (ref);
+    }
+
+    template <class T> inline
+    RccPtr<T> rcc_refe(T* ref)
+    {
+        return RccPtr<T> (refe(ref));
+    }
+
+    template <class T> inline
+    void swap(RccPtr<T>& to, RccPtr<T>& from)
+    {
+        to.Swap(from);
+    }
+
+    template <class T> inline
+    bool is_null(const RccPtr<T>& ptr)
+    {
+        return !ptr.Get();
+    }
 
 }
 

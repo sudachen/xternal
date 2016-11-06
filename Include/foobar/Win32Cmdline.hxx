@@ -36,19 +36,18 @@ in this Software without prior written authorization of the copyright holder.
 
 namespace foobar
 {
-	struct Win32Cmdline 
-	{
-		static Cmdline Parse(const char* optlist, const wchar_t* const*argv, int argc)
-		{
-			std::vector<std::string> u8;
-			for ( int i = 0; i < argc; ++i )
-				u8.push_back(Strarg<char>(argv[i]).Str());
-			std::vector<char*> u8argv;
-			for ( int i = 0; i < argc; ++i )
-				u8argv.push_back((char*)u8[i].c_str());
-			return Cmdline::Parse(optlist,&u8argv[0],argc);
-		}
-	};
+    struct Win32Cmdline
+    {
+        static Cmdline Parse(const char* optlist, const wchar_t* const* argv, int argc)
+        {
+            std::vector<std::string> u8;
+            for ( int i = 0; i < argc; ++i )
+                u8.push_back(Strarg<char>(argv[i]).Str());
+            std::vector<char*> u8argv;
+            for ( int i = 0; i < argc; ++i )
+                u8argv.push_back((char*)u8[i].c_str());
+            return Cmdline::Parse(optlist,&u8argv[0],argc);
+        }
+    };
 }
 
-	

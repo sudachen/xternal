@@ -42,64 +42,65 @@ in this Software without prior written authorization of the copyright holder.
 namespace foobar
 {
 
-	inline std::wstring format_win32_error(int last_error)
-	{
-		std::array<wchar_t,1024> buff = {0,};
-		size_t len = 
-		    FormatMessageW(
-		        FORMAT_MESSAGE_FROM_SYSTEM |
-		        FORMAT_MESSAGE_IGNORE_INSERTS,
-		        NULL,
-		        last_error,
-		        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-		        &buff[0],
-		        (DWORD)(buff.size() - 1),
-		        NULL
-		    );
-		auto E = std::remove(buff.begin(),buff.begin()+len,'\n');
-		E = std::remove(buff.begin(),E,'\r');
-		return std::wstring(buff.begin(),E);
-	}
+    inline std::wstring format_win32_error(int last_error)
+    {
+        std::array<wchar_t,1024> buff = {0,};
+        size_t len =
+            FormatMessageW(
+                FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                last_error,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+                &buff[0],
+                (DWORD)(buff.size() - 1),
+                NULL
+            );
+        auto E = std::remove(buff.begin(),buff.begin()+len,'\n');
+        E = std::remove(buff.begin(),E,'\r');
+        return std::wstring(buff.begin(),E);
+    }
 
-	inline std::wstring format_win32_error()
-	{
-		return format_win32_error(GetLastError());
-	}
+    inline std::wstring format_win32_error()
+    {
+        return format_win32_error(GetLastError());
+    }
 
     inline Path<wchar_t> get_executable_path()
     {
-      std::vector<wchar_t> exe_path(260);
-      for(;;) {
-        ::GetModuleFileNameW(0,&exe_path[0],(DWORD)exe_path.size());
-        if ( GetLastError() != ERROR_INSUFFICIENT_BUFFER )
-          break;
-        exe_path.resize(exe_path.size()*2);
-      }
-      return Path<wchar_t>(&exe_path[0]).Fullpath();
+        std::vector<wchar_t> exe_path(260);
+        for (;;)
+        {
+            ::GetModuleFileNameW(0,&exe_path[0],(DWORD)exe_path.size());
+            if ( GetLastError() != ERROR_INSUFFICIENT_BUFFER )
+                break;
+            exe_path.resize(exe_path.size()*2);
+        }
+        return Path<wchar_t>(&exe_path[0]).Fullpath();
     }
 
     inline std::wstring get_executable_name()
     {
-      return get_executable_path().Name();
+        return get_executable_path().Name();
     }
 
 
     inline const OSVERSIONINFOW& get_windows_version_info()
     {
-      static OSVERSIONINFOW nfo = {0,};
-      if ( nfo.dwOSVersionInfoSize == 0 )
-      {
-        nfo.dwOSVersionInfoSize = sizeof(nfo);
-        ::GetVersionExW(&nfo);
-      }
-      return nfo;
+        static OSVERSIONINFOW nfo = {0,};
+        if ( nfo.dwOSVersionInfoSize == 0 )
+        {
+            nfo.dwOSVersionInfoSize = sizeof(nfo);
+            ::GetVersionExW(&nfo);
+        }
+        return nfo;
     }
 
     inline size_t windows_version()
     {
-      const OSVERSIONINFOW& nfo = get_windows_version_info();
-      return nfo.dwMajorVersion * 100
-          +  nfo.dwMinorVersion;
+        const OSVERSIONINFOW& nfo = get_windows_version_info();
+        return nfo.dwMajorVersion * 100
+               +  nfo.dwMinorVersion;
     }
 
     const size_t WINDOWS81_VERSION    = 603;

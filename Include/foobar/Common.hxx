@@ -62,7 +62,7 @@ in this Software without prior written authorization of the copyright holder.
 # if defined __GNUC__
 #  define NO_INLINE  __attribute__((noinline))
 # else
-#  define NO_INLINE 
+#  define NO_INLINE
 # endif
 #endif
 
@@ -110,68 +110,69 @@ in this Software without prior written authorization of the copyright holder.
 namespace foobar
 {
 
-	template < class T >
-	struct Enum
-	{
-		T value;
-		operator T() const { return value; }
-		operator int() const { return value; }
-		operator unsigned int() const { return value; }
+    template <class T>
+    struct Enum
+    {
+        T value;
+        operator T() const { return value; }
+        operator int() const { return value; }
+        operator unsigned int() const { return value; }
         Enum& operator = (int a) { value = a; return *this; }
         Enum& operator |= (int a) { value = T(value | a); return *this; }
         T operator | (T a) const { return T (value | a); }
-		Enum(int a) : value((T)a) {}
-		Enum(T a) : value(a) {}
-	};
+        Enum(int a) : value((T)a) {}
+        Enum(T a) : value(a) {}
+    };
 
-	struct NewValue 
-	{ 
-		char _; 
-		template <class T> operator std::unique_ptr<T>() const
-		{ return std::unique_ptr<T>(new T()); }
-		template <class T> operator std::shared_ptr<T>() const
-		{ return std::shared_ptr<T>(new T()); }
-	};
-	static const NewValue New = {0};
-	
-	struct NoneValue { 
-		char _; 
-		template <class T> operator std::unique_ptr<T>() const
-		{ return std::unique_ptr<T>(0); }
-		template <class T> operator std::shared_ptr<T>() const
-		{ return std::shared_ptr<T>(0); }
-	};
-	static const NoneValue None = {0};
+    struct NewValue
+    {
+        char _;
+        template <class T> operator std::unique_ptr<T>() const
+        { return std::unique_ptr<T>(new T()); }
+        template <class T> operator std::shared_ptr<T>() const
+        { return std::shared_ptr<T>(new T()); }
+    };
+    static const NewValue New = {0};
 
-	struct NonCopyableFiller {};
+    struct NoneValue
+    {
+        char _;
+        template <class T> operator std::unique_ptr<T>() const
+        { return std::unique_ptr<T>(0); }
+        template <class T> operator std::shared_ptr<T>() const
+        { return std::shared_ptr<T>(0); }
+    };
+    static const NoneValue None = {0};
 
-	template < class T = NonCopyableFiller >
-	struct NonCopyableT : T
-	{
-	protected:
-		NonCopyableT() {}
-		~NonCopyableT() {}
-	private:
-		NonCopyableT(const NonCopyableT&);
-		const NonCopyableT& operator=(const NonCopyableT&);	
-	};
+    struct NonCopyableFiller {};
 
-	typedef NonCopyableT<> NonCopyable;
+    template <class T = NonCopyableFiller>
+    struct NonCopyableT : T
+    {
+    protected:
+        NonCopyableT() {}
+        ~NonCopyableT() {}
+    private:
+        NonCopyableT(const NonCopyableT&);
+        const NonCopyableT& operator=(const NonCopyableT&);
+    };
 
-	template < class T > struct Opposite { typedef void    Type; };
-	template<> struct Opposite<char>     { typedef wchar_t Type; };
-	template<> struct Opposite<wchar_t>  { typedef char    Type; };
+    typedef NonCopyableT<> NonCopyable;
 
-	template < class T >
+    template <class T> struct Opposite { typedef void    Type; };
+    template<> struct Opposite<char>     { typedef wchar_t Type; };
+    template<> struct Opposite<wchar_t>  { typedef char    Type; };
+
+    template <class T>
     struct Option
-	{
-#ifdef __x86_64
+    {
+        #ifdef __x86_64
         __declspec(align(8))
-#else
+        #else
         __declspec(align(4))
-#endif
+        #endif
         uint8_t value[sizeof(T)];
-		bool specified;
+        bool specified;
         Option() : specified(false) {}
         Option(NoneValue) : specified(false) {}
         Option(T value) : specified(true)
@@ -208,20 +209,20 @@ namespace foobar
         T* operator ->() { return &Get(); }
         const T* operator ->() const { return &Get(); }
 
-		bool operator ==(NoneValue) const { return !specified; }
-		bool operator !=(NoneValue) const { return specified; }
-		bool Exists() const { return specified; }
+        bool operator ==(NoneValue) const { return !specified; }
+        bool operator !=(NoneValue) const { return specified; }
+        bool Exists() const { return specified; }
 
-		Option& Swap(Option& o)
-		{
+        Option& Swap(Option& o)
+        {
             for (auto i = &value[0], j = &o.value[0],
                  iE = &value[0]+sizeof(T);
                  i != iE; ++i, ++j)
-              std::swap(*i,*j);
+                std::swap(*i,*j);
 
-			std::swap(specified, o.specified);
-			return *this;
-		}
+            std::swap(specified, o.specified);
+            return *this;
+        }
 
         T& Get()
         {
@@ -235,83 +236,83 @@ namespace foobar
             return *(T*)&value[0];
         }
 
-		typedef const T&(Option<T>::*BooleanType)() const;
-		operator BooleanType() const { return &Option<T>::Get; }
+        typedef const T& (Option<T>::*BooleanType)() const;
+        operator BooleanType() const { return &Option<T>::Get; }
 
-	};
+    };
 
-	template < class T >
-	struct Option<T&>
-	{
-		T* value;
-		bool specified;
-		Option() {}
-		Option(T& value) : value(&value), specified(true) {}
-		Option(NoneValue) : value(), specified(false) {}
+    template <class T>
+    struct Option<T&>
+    {
+        T* value;
+        bool specified;
+        Option() {}
+        Option(T& value) : value(&value), specified(true) {}
+        Option(NoneValue) : value(), specified(false) {}
 
-		T& operator *() const  { return *value; }
-		operator T& () const   { return *value; }
-		T* operator ->() const { return value; }
+        T& operator *() const  { return *value; }
+        operator T& () const   { return *value; }
+        T* operator ->() const { return value; }
 
-		bool operator ==(NoneValue) { return !specified; }
-		bool operator !=(NoneValue) { return specified; }
+        bool operator ==(NoneValue) { return !specified; }
+        bool operator !=(NoneValue) { return specified; }
 
-		const T& Get() const { return *value;}
-		typedef const T&(Option<T&>::*BooleanType)() const;
-		operator BooleanType() const { return &Option<T&>::Get; }
+        const T& Get() const { return *value;}
+        typedef const T& (Option<T&>::*BooleanType)() const;
+        operator BooleanType() const { return &Option<T&>::Get; }
 
-	private:
-		void operator =(const Option&);
-	};
+    private:
+        void operator =(const Option&);
+    };
 
-	/*
-	template <class T>
-	inline T& operator <<=(Option<T>& opt, T value)
-	{
-		opt = value;
-		return opt.Get();
-	}
-	*/
+    /*
+    template <class T>
+    inline T& operator <<=(Option<T>& opt, T value)
+    {
+        opt = value;
+        return opt.Get();
+    }
+    */
 
-	template <class T> struct ExactType 
-	{
-		typedef T Type;
-		ExactType() {}
-	};
+    template <class T> struct ExactType
+    {
+        typedef T Type;
+        ExactType() {}
+    };
 
-	template <class T1, class T2> struct ExactType2 
-	{
-		typedef T1 Type1;
-		typedef T2 Type2;
-		ExactType2() {}
-	};
+    template <class T1, class T2> struct ExactType2
+    {
+        typedef T1 Type1;
+        typedef T2 Type2;
+        ExactType2() {}
+    };
 
-	template < class T, size_t N > T* begin(T(&a)[N]) { return a; }
-	template < class T, size_t N > T* end(T(&a)[N]) { return a + N; }
-	template < class T, size_t N > size_t length_of(T(&a)[N]) { return N; }
+    template <class T, size_t N> T* begin(T(&a)[N]) { return a; }
+    template <class T, size_t N> T* end(T(&a)[N]) { return a + N; }
+    template <class T, size_t N> size_t length_of(T(&a)[N]) { return N; }
 
-	template < class Trng, class Tfn >
-	void for_each(Trng& rng, Tfn fn)
-	{
-		for (auto i = begin(rng), iE = end(rng); i != iE; ++i)
-			fn(*i);
-	}
+    template <class Trng, class Tfn>
+    void for_each(Trng& rng, Tfn fn)
+    {
+        for (auto i = begin(rng), iE = end(rng); i != iE; ++i)
+            fn(*i);
+    }
 
-	struct Boolean 
-	{ 
-		int value; 
-		explicit Boolean(int value) : value(value?1:0) {}
-		Boolean operator !() const { return Boolean(value?0:1); }
-		operator int() const { return value; }
-	};
+    struct Boolean
+    {
+        int value;
+        explicit Boolean(int value) : value(value?1:0) {}
+        Boolean operator !() const { return Boolean(value?0:1); }
+        operator int() const { return value; }
+    };
 
-	static const Boolean True = Boolean(1);
-	static const Boolean False = Boolean(0);
+    static const Boolean True = Boolean(1);
+    static const Boolean False = Boolean(0);
 
     struct VoidValue
     {
-        VoidValue(){}
-        VoidValue(NoneValue){}
+        VoidValue() {}
+        VoidValue(NoneValue) {}
     };
 
     template<class T, class Ex>
@@ -330,7 +331,7 @@ namespace foobar
             if ( r != None ) return r.Get();
             FOOBAR_UNREACHABLE();
         }
-        operator const T&() const { return Get(); }
+        operator const T& () const { return Get(); }
         bool Succeeded() const { return ex == None && r != None; }
         bool Failed() const { return !Succeeded(); }
         const T& operator->() const { return Get(); }
@@ -342,7 +343,7 @@ namespace foobar
     {
         Option<Ex> ex;
         Either(Ex&& e) : ex(std::move(e)) {}
-        Either(VoidValue){}
+        Either(VoidValue) {}
         Either(const Ex& e) : ex(e) {}
         Either(const Option<VoidValue>& value, const Option<Ex>& e) : ex(e) {}
         bool Succeeded() const { return ex == None; }
@@ -353,20 +354,20 @@ namespace foobar
 
     struct Error: std::runtime_error
     {
-      Error(const char* text)
-        : std::runtime_error(text)
-      {}
-      Error(std::string&& text)
-        : std::runtime_error(std::move(text))
-      {}
-      Error(const std::string& text)
-        : std::runtime_error(text)
-      {}
+        Error(const char* text)
+            : std::runtime_error(text)
+        {}
+        Error(std::string&& text)
+            : std::runtime_error(std::move(text))
+        {}
+        Error(const std::string& text)
+            : std::runtime_error(text)
+        {}
 
-      template <class T, class E>
-      Error(const Either<T, E>& e)
-        : std::runtime_error(e.ex == None ? "none error": e.ex->what())
-      {}
+        template <class T, class E>
+        Error(const Either<T, E>& e)
+            : std::runtime_error(e.ex == None ? "none error": e.ex->what())
+        {}
     };
 
     template <class T> struct UnVoid { typedef T Type; };
@@ -391,7 +392,7 @@ namespace foobar
         {
             if ( e.ex.Exists() )
             {
-                throw *e.ex;
+                throw* e.ex;
             }
         }
 

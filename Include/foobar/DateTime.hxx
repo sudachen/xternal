@@ -11,17 +11,17 @@ namespace foobar
 {
     struct LongDate
     {
-#if !defined _BIGENDIAN
+        #if !defined _BIGENDIAN
         uint32_t segundes : 16;
         uint32_t day : 5;
         uint32_t month : 4;
         uint32_t year : 7;
-#else
+        #else
         uint32_t year : 7;
         uint32_t month : 4;
         uint32_t day : 5;
         uint32_t segundes : 16;
-#endif
+        #endif
 
         uint32_t Hour() const
         {
@@ -73,17 +73,17 @@ namespace foobar
 
         struct
         {
-#if !defined _BIGENDIAN
+            #if !defined _BIGENDIAN
             uint32_t day : 5;
             uint32_t month : 4;
             uint32_t year : 22;
             uint32_t cc : 1;
-#else
+            #else
             uint32_t cc : 1;
             uint32_t year : 22;
             uint32_t month : 4;
             uint32_t day : 5;
-#endif
+            #endif
         } dmyc;
 
         uint32_t _first_word() const
@@ -205,7 +205,8 @@ namespace foobar
 
         const char* Smon(bool shortform = true) const
         {
-            static const char* m[12][2] = {
+            static const char* m[12][2] =
+            {
                 {"Jan", "January"},
                 {"Feb", "February"},
                 {"Mar", "March"},
@@ -228,7 +229,7 @@ namespace foobar
             return m[month - 1][shortform ? 0 : 1];
         }
 
-        const char *Lmon() const
+        const char* Lmon() const
         {
             return Smon(false);
         }
@@ -341,7 +342,7 @@ namespace foobar
 
         void InitWholeFromPOSIXtime(time_t t)
         {
-            if ( tm * xtm = localtime(&t) )
+            if ( tm* xtm = localtime(&t) )
             {
                 tm tm = *xtm;
                 Year(tm.tm_year + 1900);
@@ -375,7 +376,7 @@ namespace foobar
 
             // M$VC swscanf isn't able to use constant strings
             sscanf(cStr.Cstr(), "%d-%d-%d %c%c %d:%d:%d %d",
-                &day, &mon, &year, &b, &c, &h, &m, &s, &u);
+                   &day, &mon, &year, &b, &c, &h, &m, &s, &u);
 
             if ( b == 'b' || b == 'B' ) year = -year;
             Day(day).Month(mon).Year(year).Time(h, m, s, u);
@@ -531,37 +532,37 @@ namespace foobar
 
     inline void timeout(Timeout tm)
     {
-#ifdef _WIN32
-		Sleep(tm.MilliSeconds());
-#else
-		usleep(tm.MilliSeconds());
-#endif
+        #ifdef _WIN32
+        Sleep(tm.MilliSeconds());
+        #else
+        usleep(tm.MilliSeconds());
+        #endif
     }
-    
+
     inline NO_INLINE uint64_t SystemUseconds()
     {
-#ifdef _WIN32
+        #ifdef _WIN32
         SYSTEMTIME systime = {0};
         FILETIME ftime;
         uint64_t Q;
         GetSystemTime(&systime);
         SystemTimeToFileTime(&systime, &ftime);
         Q = ((uint64_t)ftime.dwHighDateTime << 32) + (uint64_t)ftime.dwLowDateTime;
-#    if defined _MSC_VER && _MSC_VER < 1300
+        #    if defined _MSC_VER && _MSC_VER < 1300
         {
             uint64_t QQ = 116444736;
             QQ *= 1000000000;
             Q -= QQ;
         }
-#    else
+        #    else
         Q -= 116444736000000000LL; /* posix epoche */
-#    endif
+        #    endif
         return Q / 10;
-#else
+        #else
         struct timeval tv = {0};
         gettimeofday(&tv, 0);
         return ((uint64_t)tv.tv_sec * 1000 * 1000 + (uint64_t)tv.tv_usec);
-#endif
+        #endif
     }
 
     inline uint64_t SystemMillis()

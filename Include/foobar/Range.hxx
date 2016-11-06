@@ -33,87 +33,87 @@ in this Software without prior written authorization of the copyright holder.
 
 namespace foobar
 {
-	inline size_t count_cstring_region(char* str) { return str ? strlen(str) : 0; }
-	inline size_t count_cstring_region(wchar_t* str) { return str ? wcslen(str) : 0; }
+    inline size_t count_cstring_region(char* str) { return str ? strlen(str) : 0; }
+    inline size_t count_cstring_region(wchar_t* str) { return str ? wcslen(str) : 0; }
 
-	template < class T >
-	struct Range : NonCopyable
-	{
-		const T* at;
-		size_t count;
+    template <class T>
+    struct Range : NonCopyable
+    {
+        const T* at;
+        size_t count;
 
-		Range(NoneValue)
-			: at(0), count(0)
-		{}
+        Range(NoneValue)
+            : at(0), count(0)
+        {}
 
-		Range(const T* at, size_t count)
-			: at(at), count(count)
-		{}
+        Range(const T* at, size_t count)
+            : at(at), count(count)
+        {}
 
-		Range(const T* at, const T* until)
-			: at(at), count(until - at)
-		{}
+        Range(const T* at, const T* until)
+            : at(at), count(until - at)
+        {}
 
-		Range(const T* until_zero) /* will compile successful only for char and wchar_t */
-			: at(until_zero), count(count_cstring_region(until_zero))
-		{}
+        Range(const T* until_zero) /* will compile successful only for char and wchar_t */
+            : at(until_zero), count(count_cstring_region(until_zero))
+        {}
 
-		template < size_t N >
-		Range(const T(&arr)[N])
-			: at(arr), count(N)
-		{}
+        template <size_t N>
+        Range(const T(&arr)[N])
+            : at(arr), count(N)
+        {}
 
-		Range(std::basic_string<T>& str)
-			: at(str->c_str()), count(str->length())
-		{}
+        Range(std::basic_string<T>& str)
+            : at(str->c_str()), count(str->length())
+        {}
 
-		Range(const std::vector<T>& vect)
-			: at(&vect[0]), count(vect.size())
-		{}
+        Range(const std::vector<T>& vect)
+            : at(&vect[0]), count(vect.size())
+        {}
 
-		const T& operator[](int idx) const
-		{
-			FOOBAR_ASSERT(at != 0);
-			FOOBAR_ASSERT(idx >= 0 && idx <= count);
-			return at[idx];
-		}
+        const T& operator[](int idx) const
+        {
+            FOOBAR_ASSERT(at != 0);
+            FOOBAR_ASSERT(idx >= 0 && idx <= count);
+            return at[idx];
+        }
 
-		bool operator ==(NoneValue) const { return at == 0; }
-		bool operator !=(NoneValue) const { return at != 0; }
-	};
+        bool operator ==(NoneValue) const { return at == 0; }
+        bool operator !=(NoneValue) const { return at != 0; }
+    };
 
-	typedef const Range<char>& chars_t;
-	typedef const Range<uint8_t>& bytes_t;
+    typedef const Range<char>& chars_t;
+    typedef const Range<uint8_t>& bytes_t;
 
-	template < class T >
-	bool is_empty(const Range<T>& range)
-	{
-		return !range.count;
-	}
+    template <class T>
+    bool is_empty(const Range<T>& range)
+    {
+        return !range.count;
+    }
 
-	template < class T >
-	bool is_null(const Range<T>& range)
-	{
-		return !range.at;
-	}
+    template <class T>
+    bool is_null(const Range<T>& range)
+    {
+        return !range.at;
+    }
 
-	template < class T >
-	size_t length_of(const Range<T>& range)
-	{
-		return range.count;
-	}
+    template <class T>
+    size_t length_of(const Range<T>& range)
+    {
+        return range.count;
+    }
 
-	template < class T >
-	const T* begin(const Range<T>& range)
-	{
-		return range.at;
-	}
+    template <class T>
+    const T* begin(const Range<T>& range)
+    {
+        return range.at;
+    }
 
-	template < class T >
-	const T* end(const Range<T>& range)
-	{
-		return range.at + range.count;
-	}
+    template <class T>
+    const T* end(const Range<T>& range)
+    {
+        return range.at + range.count;
+    }
 
 }
 

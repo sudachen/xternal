@@ -15,6 +15,7 @@ OBJECTS = \
     $(OBJDIR)\rot13.obj \
     $(OBJDIR)\faq6.obj \
     $(OBJDIR)\murmur2.obj \
+    $(OBJDIR)\blowfish.obj \
 
 
 LIBRARIES=

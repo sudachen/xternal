@@ -2,7 +2,7 @@
 if not .%ENVIRONS%. == .. goto skipenv
 if .%PROCESSOR_ARCHITECTURE%. == .x86. set ENVIRONS=env32
 if .%ENVIRONS%. == .. set ENVIRONS=env64
-if .%MSRT%. == .. set MSRT=_120
+if .%MSRT%. == .. set MSRT=_140
 :skipenv
 
 if "%OUTDIR_ROOT%" == "" set OUTDIR_ROOT=%~dp0.

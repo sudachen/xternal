@@ -9,7 +9,7 @@ $(SRCDIR)\README:
 unpack:
 !endif
 
-$(TARGET): unpack $(OBJECTS)
+$(TARGETNAME): unpack $(OBJECTS)
 	$(METALINK) $(OBJECTS) $(LIBRARIES)
 	-del $(EXPNAME)
 
@@ -19,6 +19,8 @@ $(TARGET): unpack $(OBJECTS)
 	$(CC) -c $(CCXFLAGS) $(DLL_OPTS) $(INCL) -Fo$@ $<
 {$(SRCDIR)}.S{$(OBJDIR)}.obj:
 	$(AS) $(ASFLAGS) -o$@ $<
+{$(SRCDIR)}.rc{$(OBJDIR)}.obj:
+	$(RC) /fo$@ $<
 
 clean:
 	-del $(OBJECTS)

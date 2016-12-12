@@ -1,5 +1,6 @@
 
 #include "../include/libsynfo.h"
+#include <stdio.h>
 #include <windows.h>
 
 SYNFO_ERROR Synfo_Get_Os_String(char outbuf[SYNFO_OS_STRING_LENGTH])

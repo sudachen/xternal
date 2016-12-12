@@ -2,4 +2,6 @@ zlib
 openssl
 libhash
 libpe
+libconf
+libsynfo
 

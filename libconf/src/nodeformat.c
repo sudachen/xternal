@@ -1,6 +1,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include <malloc.h>
 #include "cdicto.h"

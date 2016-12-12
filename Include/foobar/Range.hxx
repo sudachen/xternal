@@ -63,8 +63,12 @@ namespace foobar
             : at(arr), count(N)
         {}
 
-        Range(std::basic_string<T>& str)
+        Range(const std::basic_string<T>& str)
             : at(str->c_str()), count(str->length())
+        {}
+
+        Range(const Option<std::basic_string<T>>& str)
+            : at(str != None ? str->c_str() : 0 ), count( str != None ? str->length() : 0 )
         {}
 
         Range(const std::vector<T>& vect)

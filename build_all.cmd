@@ -10,7 +10,7 @@ if .%1. == .clean. set ACTION=clean
 if .%1. == .rebuild. set ACTION=rebuild
 
 for /F %%i in (projects.dll.txt) do (
-	cmd /c make_one.cmd %%i dll %ACTION%
+	cmd /c make_one.cmd %%i dll x* %ACTION%
 	if errorlevel 1 goto :error
 )
 

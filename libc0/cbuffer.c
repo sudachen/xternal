@@ -27,10 +27,13 @@ in this Software without prior written authorization of the copyright holder.
 
 */
 
+#define __STDC_WANT_LIB_EXT1__ 1
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 #include "cbuffer.h"
 
@@ -200,7 +203,7 @@ void Buffer_Printf_Va(C_BUFFER* bf, char* fmt, va_list va)
 	rq_len = Buffer_Detect_Required_Size(fmt, va) + 1;
 	Buffer_Grow_Reserve(bf, bf->count + rq_len);
 
-#ifdef _WIN32
+#if (defined _WIN32) && ( _MSC_VER < 1900 )
 	q = vsprintf((char*)bf->at + bf->count, fmt, va);
 #else
 	q = vsnprintf((char*)bf->at + bf->count, rq_len, fmt, va);

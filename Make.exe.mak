@@ -18,6 +18,8 @@ $(TARGETNAME): $(UNPACK) $(OBJECTS)
 	$(CC) -c $(CCFLAGS) $(DLL_OPTS) $(INCL) -Fo$@ $<
 {$(SRCDIR)}.cpp{$(OBJDIR)}.obj:
 	$(CC) -c $(CCXFLAGS) $(DLL_OPTS) $(INCL) -Fo$@ $<
+{$(SRCDIR)}.S{$(OBJDIR)}.obj:
+	$(AS) $(ASFLAGS) -o$@ $<
 {$(SRCDIR)}.rc{$(OBJDIR)}.obj:
 	$(RC) /fo$@ $<
 

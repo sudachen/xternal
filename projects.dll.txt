@@ -7,4 +7,5 @@ expat
 libwx3
 libpe
 libconf
-
+libhash
+libsynfo

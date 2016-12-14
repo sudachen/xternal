@@ -561,7 +561,7 @@ namespace foobar
             if (opt & STREAM_READ)
                 can_read = true;
             if (opt & STREAM_SEEK)
-                can_seek = false;
+                can_seek = true;
             if ( opt & STREAM_DONOT_CLOSE )
                 do_not_close = true;
             this->name = name.Str();
@@ -718,15 +718,15 @@ namespace foobar
         {
             unsigned opts = 0;
             for (; *s; ++s)
-                switch (*s)
+                switch (tolower(*s))
                 {
-                    case '+': opts |= STREAM_WRITE; /*falldown*/
+                    case '+': opts |= STREAM_WRITE|STREAM_SEEK; /*falldown*/
                     case 'r': opts |= STREAM_READ|STREAM_SEEK; break;
                     case 'w': opts = (opts&~FILEOPEN_DISPOSITION)|STREAM_WRITE|FILEOPEN_CREATEALWAYS; break;
-                    case 'X': case 'x': opts = (opts&~FILEOPEN_DISPOSITION)|STREAM_WRITE|FILEOPEN_TRUNCATE; break;
-                    case 'N': case 'n': opts = (opts&~FILEOPEN_DISPOSITION)|STREAM_WRITE|FILEOPEN_CREATENEW; break;
+					case 'c': opts = (opts&~FILEOPEN_DISPOSITION) | STREAM_WRITE | FILEOPEN_TRUNCATE; break;
+					case 'x': opts = (opts&~FILEOPEN_DISPOSITION) | STREAM_WRITE | FILEOPEN_CREATENEW; break;
                     case 't': opts |= FILEOPEN_TEXT; break;
-                    case 'P': case 'p': opts |= FILEOPEN_CREATE_PATH; break;
+					case 'p': opts |= FILEOPEN_CREATE_PATH; break;
                     default: break;
                 }
             return opts;

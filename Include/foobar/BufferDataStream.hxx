@@ -65,6 +65,7 @@ namespace foobar
                 count = (self->bf.size() - self->pos) / size;
             if (count)
                 memcpy(buf, &self->bf[self->pos], size * count);
+			self->pos += count * size;
             return count;
         }
 
@@ -73,7 +74,8 @@ namespace foobar
             if (self->bf.size() < self->pos + size * count)
                 self->bf.resize(self->pos + size * count, 0);
             std::copy((uint8_t*)buf, (uint8_t*)buf + size * count, self->bf.begin() + self->pos);
-            return count;
+			self->pos += count * size;
+			return count;
         }
 
         static int64_t _bf_fseek(BufferDataStream* self, int64_t offs, int orign)

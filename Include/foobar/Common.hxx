@@ -237,7 +237,7 @@ namespace foobar
         }
 
         typedef const T& (Option<T>::*BooleanType)() const;
-        operator BooleanType() const { return &Option<T>::Get; }
+		operator BooleanType() const { if (specified) return &Option<T>::Get; else return nullptr; }
 
     };
 
@@ -259,7 +259,7 @@ namespace foobar
 
         const T& Get() const { return *value;}
         typedef const T& (Option<T&>::*BooleanType)() const;
-        operator BooleanType() const { return &Option<T&>::Get; }
+		operator BooleanType() const { if (specified) return &Option<T&>::Get; else return nullptr; }
 
     private:
         void operator =(const Option&);

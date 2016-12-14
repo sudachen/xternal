@@ -51,7 +51,7 @@ namespace libhash
 
 	struct SHA1 : DigestAlgo <
 			SHA1_CONTEXT,
-			typename Digest<SHA1>::Type,
+			Digest<SHA1>,
 			SHA1_Start,
 			SHA1_Update,
 			SHA1_Finish >
@@ -60,7 +60,7 @@ namespace libhash
 
 	struct SHA1_HMAC : DigestHmacAlgo <
 			SHA1_HMAC_CONTEXT,
-			typename Digest<SHA1>::Type,
+			Digest<SHA1>,
 			SHA1_HMAC_Start,
 			SHA1_HMAC_Update,
 			SHA1_HMAC_Finish >

@@ -28,11 +28,11 @@ namespace libhash
 
 		void Finish(void* dgst, size_t dgst_size)
 		{
-			assert(dgst_size == 16);
+			assert(dgst_size == Digest::BytesRequired);
 			_Finish(&ctx, dgst);
 		}
 
-		void Finish(typename Digest& dgst)
+		void Finish(typename Digest::Type& dgst)
 		{
 			_Finish(&ctx, &dgst[0]);
 		}
@@ -63,7 +63,7 @@ namespace libhash
 	};
 
 	template <
-	class CTX,
+		class CTX,
 	      class Digest,
 	      void(*_Start)(CTX*, const void*, size_t),
 	      void(*_Update)(CTX*, const void*, size_t),
@@ -84,11 +84,11 @@ namespace libhash
 
 		void Finish(void* dgst, size_t dgst_size)
 		{
-			assert(dgst_size == 16);
+			assert(dgst_size == Digest::BytesRequired);
 			_Finish(&ctx, dgst);
 		}
 
-		void Finish(typename Digest& dgst)
+		void Finish(typename Digest::Type& dgst)
 		{
 			_Finish(&ctx, &dgst[0]);
 		}

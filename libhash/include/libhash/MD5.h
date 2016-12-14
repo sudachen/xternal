@@ -51,7 +51,7 @@ namespace libhash
 
 	struct MD5 : DigestAlgo <
 			MD5_CONTEXT,
-			typename Digest<MD5>::Type,
+			Digest<MD5>,
 			MD5_Start,
 			MD5_Update,
 			MD5_Finish >
@@ -60,7 +60,7 @@ namespace libhash
 
 	struct MD5_HMAC : DigestHmacAlgo <
 			MD5_HMAC_CONTEXT,
-			typename Digest<MD5>::Type,
+			Digest<MD5>,
 			MD5_HMAC_Start,
 			MD5_HMAC_Update,
 			MD5_HMAC_Finish >

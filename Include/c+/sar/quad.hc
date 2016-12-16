@@ -1,4 +1,10 @@
 
+/*
+
+	Copyright (c) 2010-2016, Alexey Sudachen, https://goo.gl/RlZcQR
+	See license rules in C+.hc
+
+*/
 
 #ifndef C_once_631AF050_DD3C_45AA_9B7D_1213254067C2
 #define C_once_631AF050_DD3C_45AA_9B7D_1213254067C2

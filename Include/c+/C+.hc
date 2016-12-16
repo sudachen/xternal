@@ -1,8 +1,12 @@
 
 /*
 
-Copyright © 2010-2016, Alexéy Sudachén, alexey@sudachen.name
-http://libcplus.keepmywork.com/
+	Copyright (c) 2010-2016, Alexey Sudachen, https://goo.gl/RlZcQR
+	See license rules in C+.hc
+
+*/
+
+/*
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

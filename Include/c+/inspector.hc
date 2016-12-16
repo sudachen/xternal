@@ -1,9 +1,8 @@
 
 /*
 
-Copyright © 2010-2016, Alexéy Sudachén, alexey@sudachen.name
-http://libcplus.keepmywork.com/
-See license rules in C+.hc
+	Copyright (c) 2010-2016, Alexey Sudachen, https://goo.gl/RlZcQR
+	See license rules in C+.hc
 
 */
 
@@ -16,60 +15,60 @@ See license rules in C+.hc
 #define _C_INSPECTOR_PATTERN 0xaa
 #define _C_INSPECTOR_PROTAG ((uint16_t)'P'|((uint16_t)'T'<<8))
 
-typedef struct _INSPECTOR_PROLOG
+typedef struct _C_INSPECTOR_PROLOG
 {
 	uint16_t crc;
 	uint16_t tag;
 	uint32_t size;
 	byte_t pattern[8];
-} INSPECTOR_PROLOG;
+} C_INSPECTOR_PROLOG;
 
 #define	_INSPECTOR_PROLOG_SIZE 16
-__Static_Assert(sizeof(INSPECTOR_PROLOG) == _INSPECTOR_PROLOG_SIZE);
+__Static_Assert(sizeof(C_INSPECTOR_PROLOG) == _INSPECTOR_PROLOG_SIZE);
 
 enum { _C_INSPECTOR_MAX_HEAP_BLOCKS = (uint16_t)~0 };
 enum { _C_INSPECTOR_MAX_BT_DEPTH = 9 };
 #define __Inspector_Mem_Align(Count) (((size_t)Count + 7)&~(size_t)7)
 
-typedef struct _INSPECTOR_NFO_REC
+typedef struct _C_INSPECTOR_NFO_REC
 {
-	INSPECTOR_PROLOG *ptr;
+	C_INSPECTOR_PROLOG *ptr;
 	const char *source;
 	int line;
 	void *bt[_C_INSPECTOR_MAX_BT_DEPTH];
 	size_t bt_count;
-} INSPECTOR_NFO_REC;
+} C_INSPECTOR_NFO_REC;
 
-typedef struct _INSPECTOR_NFO
+typedef struct _C_INSPECTOR_NFO
 {
 	size_t count;
-	INSPECTOR_NFO_REC r[_C_INSPECTOR_MAX_HEAP_BLOCKS];
+	C_INSPECTOR_NFO_REC r[_C_INSPECTOR_MAX_HEAP_BLOCKS];
 	uint32_t crc;
-} INSPECTOR_NFO;
+} C_INSPECTOR_NFO;
 
-extern INSPECTOR_NFO __Inspector_Nfo
+extern C_INSPECTOR_NFO __Inspector_Nfo
 #ifdef _C_CORE_BUILTIN
 = { 0, }
 #endif
 ;
 
-typedef struct _INSPECTOR_GRAVEYARD_REC
+typedef struct _C_INSPECTOR_GRAVEYARD_REC
 {
 	void *ptr;
 	size_t mark;
 	void *bt[_C_INSPECTOR_MAX_BT_DEPTH];
 	size_t bt_count;
-} INSPECTOR_GRAVEYARD_REC;
+} C_INSPECTOR_GRAVEYARD_REC;
 
-typedef struct _INSPECTOR_GRAVEYARD
+typedef struct _C_INSPECTOR_GRAVEYARD
 {
 	size_t mark;
-	INSPECTOR_GRAVEYARD_REC r[_C_INSPECTOR_MAX_HEAP_BLOCKS];
-} INSPECTOR_GRAVEYARD;
+	C_INSPECTOR_GRAVEYARD_REC r[_C_INSPECTOR_MAX_HEAP_BLOCKS];
+} C_INSPECTOR_GRAVEYARD;
 
 enum { _C_INSPECTOR_GRAVEYARD_DEPTH = 32 };
 
-extern INSPECTOR_GRAVEYARD __Inspector_Graveyard
+extern C_INSPECTOR_GRAVEYARD __Inspector_Graveyard
 #ifdef _C_CORE_BUILTIN
 = { 0, }
 #endif
@@ -170,7 +169,7 @@ void __Inspector_Fatal_Error(const char *text)
 }
 
 __No_Return
-void __Inspector_Mem_Error(const char *text, INSPECTOR_NFO_REC *nfo, INSPECTOR_GRAVEYARD_REC *gy)
+void __Inspector_Mem_Error(const char *text, C_INSPECTOR_NFO_REC *nfo, C_INSPECTOR_GRAVEYARD_REC *gy)
 {
 	size_t bt_count;
 	void *bt[_C_INSPECTOR_MAX_BT_DEPTH];
@@ -200,12 +199,12 @@ void __Inspector_Mem_Error(const char *text, INSPECTOR_NFO_REC *nfo, INSPECTOR_G
 	abort();
 }
 
-void __Inspector_Verify_Rec(INSPECTOR_NFO_REC *r)
+void __Inspector_Verify_Rec(C_INSPECTOR_NFO_REC *r)
 {
 	int i;
 	uint8_t *pat;
 	uint16_t crc;
-	INSPECTOR_PROLOG *pro = r->ptr;
+	C_INSPECTOR_PROLOG *pro = r->ptr;
 	if (r->ptr->tag != _C_INSPECTOR_PROTAG)
 		__Inspector_Mem_Error("invalid tag", r, 0);
 	crc = __Inspector_Crc_16(0xffff, (uint8_t*)pro + sizeof(pro->crc), _INSPECTOR_PROLOG_SIZE - sizeof(pro->crc));
@@ -261,7 +260,7 @@ void __Inspector_Graveyard_Rise(void *ptr)
 	}
 }
 
-INSPECTOR_GRAVEYARD_REC *__Inspector_Graveyard_Bury(void *ptr)
+C_INSPECTOR_GRAVEYARD_REC *__Inspector_Graveyard_Bury(void *ptr)
 {
 	size_t count = 0;
 	size_t idx = __Inspector_Crc_16(0xffff, &ptr, sizeof(ptr));
@@ -283,7 +282,7 @@ INSPECTOR_GRAVEYARD_REC *__Inspector_Graveyard_Bury(void *ptr)
 	return &__Inspector_Graveyard.r[older_idx];
 }
 
-INSPECTOR_GRAVEYARD_REC *__Inspector_Graveyard_Find(void *ptr)
+C_INSPECTOR_GRAVEYARD_REC *__Inspector_Graveyard_Find(void *ptr)
 {
 	size_t count = 0;
 	size_t idx = __Inspector_Crc_16(0xffff, &ptr, sizeof(ptr));
@@ -296,7 +295,7 @@ INSPECTOR_GRAVEYARD_REC *__Inspector_Graveyard_Find(void *ptr)
 	return 0;
 }
 
-INSPECTOR_NFO_REC *__Inspector_Nfo_Allocate(void *ptr, int line, const char *source)
+C_INSPECTOR_NFO_REC *__Inspector_Nfo_Allocate(void *ptr, int line, const char *source)
 {
 	size_t idx = __Inspector_Crc_16(0xffff, &ptr, sizeof(ptr));
 	size_t count = 0;
@@ -314,7 +313,7 @@ found:
 	return &__Inspector_Nfo.r[idx];
 }
 
-size_t __Inspector_Find(INSPECTOR_PROLOG *pro)
+size_t __Inspector_Find(C_INSPECTOR_PROLOG *pro)
 {
 	size_t idx = __Inspector_Crc_16(0xffff, &pro, sizeof(pro));
 	size_t count = 0;
@@ -329,7 +328,7 @@ found:
 	return idx;
 }
 
-void __Inspector_Nfo_Release(INSPECTOR_PROLOG *pro)
+void __Inspector_Nfo_Release(C_INSPECTOR_PROLOG *pro)
 {
 	size_t idx = __Inspector_Find(pro);
 	__Inspector_Verify_Rec(&__Inspector_Nfo.r[idx]);
@@ -337,9 +336,9 @@ void __Inspector_Nfo_Release(INSPECTOR_PROLOG *pro)
 	--__Inspector_Nfo.count;
 }
 
-INSPECTOR_PROLOG *__Inspector_Find_And_Verify(void *ptr)
+C_INSPECTOR_PROLOG *__Inspector_Find_And_Verify(void *ptr)
 {
-	INSPECTOR_PROLOG *pro = (INSPECTOR_PROLOG *)ptr - 1;
+	C_INSPECTOR_PROLOG *pro = (C_INSPECTOR_PROLOG *)ptr - 1;
 	size_t idx = __Inspector_Find(pro);
 	__Inspector_Verify_Rec(&__Inspector_Nfo.r[idx]);
 	return __Inspector_Nfo.r[idx].ptr;
@@ -352,8 +351,8 @@ void *__Inspector_Malloc(size_t size, int line, const char *source)
 	__Inspector_Verify_Before(_C_INSPECT_ON_ALLOC, line, source);
 	__Inspector_Interlock
 	{
-		INSPECTOR_PROLOG *pro;
-		INSPECTOR_NFO_REC *nfo;
+		C_INSPECTOR_PROLOG *pro;
+		C_INSPECTOR_NFO_REC *nfo;
 		size_t total = __Inspector_Mem_Align(size) + _INSPECTOR_PROLOG_SIZE + 8;
 		uint8_t *ptr = (uint8_t*)malloc(total);
 
@@ -361,7 +360,7 @@ void *__Inspector_Malloc(size_t size, int line, const char *source)
 			__Inspector_Fatal_Error("out of memory");
 
 		nfo = __Inspector_Nfo_Allocate(ptr,line,source);
-		nfo->ptr = pro = (INSPECTOR_PROLOG *)ptr;
+		nfo->ptr = pro = (C_INSPECTOR_PROLOG *)ptr;
 		memset(pro->pattern, 0xaa, sizeof(pro->pattern));
 		memset(ptr + _INSPECTOR_PROLOG_SIZE + size, 0xaa, __Inspector_Mem_Align(size) - size + 8 );
 		pro->size = size;
@@ -394,8 +393,8 @@ void __Inspector_Free(void *ptr)
 	if (ptr != 0)
 		__Inspector_Interlock
 		{
-			INSPECTOR_PROLOG *pro = (INSPECTOR_PROLOG *)ptr - 1;
-			INSPECTOR_GRAVEYARD_REC *gy = __Inspector_Graveyard_Find(ptr);
+			C_INSPECTOR_PROLOG *pro = (C_INSPECTOR_PROLOG *)ptr - 1;
+			C_INSPECTOR_GRAVEYARD_REC *gy = __Inspector_Graveyard_Find(ptr);
 			if ( gy )
 				__Inspector_Mem_Error("trying to free memory twice", 0, gy);
 			__Inspector_Nfo_Release(pro);
@@ -414,7 +413,7 @@ void *__Inspector_Realloc(void *ptr, size_t size, int line, const char *source)
 	void *result = __Inspector_Malloc(size, line, source);
 	if (ptr)
 	{
-		INSPECTOR_PROLOG *pro = __Inspector_Find_And_Verify(ptr);
+		C_INSPECTOR_PROLOG *pro = __Inspector_Find_And_Verify(ptr);
 		size_t count = pro->size;
 		if (count > size) count = size;
 		memcpy(result, ptr, count);
@@ -432,7 +431,7 @@ size_t __Inspector_Msize(void *ptr, int line, const char *source)
 	__Inspector_Verify_Before(_C_INSPECT_ON_INFO, line, source);
 	__Inspector_Interlock
 	{
-		INSPECTOR_PROLOG *pro = __Inspector_Find_And_Verify(ptr);
+		C_INSPECTOR_PROLOG *pro = __Inspector_Find_And_Verify(ptr);
 		result = pro->size;
 	}
 	__Inspector_Verify_After(_C_INSPECT_ON_INFO, line, source);
@@ -445,6 +444,6 @@ size_t __Inspector_Msize(void *ptr, int line, const char *source)
 #define calloc(Num,Size)  __Inspector_Calloc(Num,Size,__LINE__,__FILE__)
 #define realloc(Ptr,Size) __Inspector_Realloc(Ptr,Size,__LINE__,__FILE__)
 #define _msize(Ptr)       __Inspector_Msize(Ptr,__LINE__,__FILE__)
-#define free			  __Inspector_Free
+#define free              __Inspector_Free
 
 

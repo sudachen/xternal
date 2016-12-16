@@ -1,4 +1,0 @@
-@echo off 
-rem set MAKEIT_NAME=project name here
-rem set MAKEIT_DIR=%~dp0
-cmd /c ..\make_one.cmd dll %*

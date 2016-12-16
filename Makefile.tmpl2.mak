@@ -1,20 +1,16 @@
 
 TOPDIR  =..
+EXECUTABLE = $(PROJECT)
+
 !include $(XTERNAL)\Make.rules.mak
 
 SRCDIR  = .
 OBJECTS = \
-	$(OBJDIR)\dllmain.obj
+	$(OBJDIR)\main.obj
 
 LIBRARIES=libconf$(LIBSFX).lib zlib$(LIBSFX).lib expatw$(LIBSFX).lib 
 
-!if "$(STATIC_LIB)"!="YES"
-DLL_OPTS=-DMYOWN_BUILD_DLL
-!else
-DLL_OPTS=-DMYOWN_STATIC
-!endif
-
-!include $(XTERNAL)\Make.dll.mak
+!include $(XTERNAL)\Make.exe.mak
 
 
 

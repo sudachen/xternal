@@ -1,8 +1,7 @@
 @echo off
-rem set MAKEIT_NAME=project name here
-rem set MAKEIT_DIR=%~dp0
 
 if "%MAKEIT_DIR%" == "" set MAKEIT_DIR=%CD%
+if "%MAKEIT_NAME%" == "" call :set_makeit_name "%MAKEIT_DIR:~0,-1%"
 
 set MAKEIT_ENV=x64
 if .%PROCESSOR_ARCHITECTURE%. == .x86. set MAKEIT_ENV=x32
@@ -39,3 +38,7 @@ if errorlevel 1 exit
 cd %MAKEIT_DIR%..
 cmd /c %MEKEIT_PROC_DIR%make_one.cmd %MAKEIT_NAME% %MAKEIT_ENV% %MAKEIT_REL% %*
 
+goto :eof
+:set_makeit_name
+    SET MAKEIT_NAME=%~n1
+goto :eof

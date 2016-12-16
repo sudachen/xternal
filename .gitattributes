@@ -1,0 +1,5 @@
+*.hc linguist-language=C
+*.hxx linguist-language=C++
+*.cxx linguist-language=C++
+
+

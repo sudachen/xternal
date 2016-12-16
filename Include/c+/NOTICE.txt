@@ -1,0 +1,5 @@
+
+Alternative C framework aka C+
+Copyrigh 2010-2016 Alexey Sudachen.
+
+

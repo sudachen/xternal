@@ -1,5 +1,5 @@
 
-.SUFFIXES: .c .cc .cxx .obj .lib .dll .exe .S .txt
+.SUFFIXES: .c .cc .cxx .obj .lib .dll .exe .S .txt $(EXTRA_SUFFIXES)
 
 xEXE = .exe
 xDLL = .dll
@@ -44,8 +44,36 @@ TEMP_BUILD=$(TEMP)
 !endif
 
 NOLOGO = -nologo
+!if "$(_CCFLAGS)"==""
 _CCFLAGS = /Gy /FC /GF /Zi /DWIN32 /D_WIN32_WINNT=0x0600
+!endif
+!if "$(_CCXFLAGS)"==""
 _CCXFLAGS = $(_CCFLAGS) /EHsc /GR -wd4530 /DWIN32 /D_WIN32_WINNT=0x0600
+!endif
+
+!if "$(_ECCFLAGS_REL)"==""
+_ECCFLAGS_REL = /O2 /Oy-
+!endif
+
+!if "$(_ECCFLAGS_DBG)"==""
+_ECCFLAGS_DBG = /Od /GS /RTC1
+!endif
+
+!if "$(_ECCFLAGS_STATIC_REL)"==""
+_ECCFLAGS_STATIC_REL = $(_ECCFLAGS_REL)
+!endif
+
+!if "$(_ECCFLAGS_STATIC_DBG)"==""
+_ECCFLAGS_STATIC_DBG = $(_ECCFLAGS_DBG)
+!endif
+
+!if "$(_ECCFLAGS_DLL_REL)"==""
+_ECCFLAGS_DLL_REL = $(_ECCFLAGS_REL) /GL
+!endif
+
+!if "$(_ECCFLAGS_DLL_DBG)"==""
+_ECCFLAGS_DLL_DBG = $(_ECCFLAGS_DBG)
+!endif
 
 !if "$(STATIC)" == "YES" || "$(STATIC)" == "YENO"
 !if "$(STATIC)" == "YES"
@@ -63,13 +91,13 @@ VCRT=T
 !if "$(DEBUG)" != "YES"
 DBGSFX =
 LIBSFX = $(TARGET_INFIX)-mt
-_ECCFLAGS = /O2 /Oy- /MT
+_ECCFLAGS = $(_ECCFLAGS_STATIC_REL) /MT
 !else
 DLLSFX = $(DLLSFX)d 
 LIBSFX1 = $(LIBSFX1)d
 DBGSFX = _Dbg
 LIBSFX = $(TARGET_INFIX)d-mt
-_ECCFLAGS = /Od /GS /RTC1 /D_DEBUG /MTd
+_ECCFLAGS = $(_ECCFLAGS_STATIC_DBG) /D_DEBUG /MTd
 VCRT=$(VCRT)d
 !endif
 !else
@@ -81,13 +109,13 @@ LINKSFX = _DLL
 DBGSFX = 
 LIBSFX = $(TARGET_INFIX)-md
 DLLSFX = $(TARGET_INFIX)
-_ECCFLAGS = /O1 /Oy- /GL /MD
+_ECCFLAGS = $(_ECCFLAGS_DLL_REL) /MD
 LTCG=/LTCG
 !else
 DBGSFX = _Dbg
 LIBSFX = $(TARGET_INFIX)d-md
 DLLSFX = $(TARGET_INFIX)d
-_ECCFLAGS = /Od /GS /RTC1 /D_DEBUG /MDd
+_ECCFLAGS = $(_ECCFLAGS_DLL_DBG) /D_DEBUG /MDd
 VCRT=$(VCRT)d
 !endif
 !endif

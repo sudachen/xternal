@@ -2,7 +2,7 @@ TOPDIR=$(XTERNAL)
 PROJECT=libcurl
 !INCLUDE $(TOPDIR)\Make.rules.mak
 
-#SRCDIR = curl-7.51.x 
+SRCDIR = $(SRCDIR)_$(TARGET_CPU) 
 
 !if "$(CONFIG)"=="Release"
 OBJDIR=R
@@ -25,12 +25,22 @@ $(SRCDIR)\README:
 $(SRCDIR)\lib\Makefile.Lib: Makefile.Lib
 	copy Makefile.Lib $(SRCDIR)\lib
 
-$(TARGET): $(SRCDIR)\README $(SRCDIR)\lib\Makefile.Lib libcurl
+$(SRCDIR)\src\Makefile.Src: Makefile.Src
+	copy Makefile.Src $(SRCDIR)\src
+
+$(TARGET): $(SRCDIR)\README $(SRCDIR)\lib\Makefile.Lib $(SRCDIR)\src\Makefile.Src libcurl curl
 	-del $(EXPNAME)
 
 libcurl:
 	cd $(SRCDIR)\lib
 	$(MAKE) -f Makefile.Lib LIBSFX=$(LIBSFX) DLLSFX=$(DLLSFX) MACHINE=$(TARGET_CPU) CFG=$(CFG)
+	cd $(XTERNAL)\libcurl
+curl:
+!if "$(STATIC_LIB)"!="YES"
+	cd $(SRCDIR)\src
+	$(MAKE) -f Makefile.Src LIBSFX=$(LIBSFX) DLLSFX=$(DLLSFX) MACHINE=$(TARGET_CPU) CONFIG=$(CONFIG)
+	cd $(XTERNAL)\libcurl
+!endif
 
 clean:
 	-del /q $(XTERNAL)\~$(CONFIG)\.lib\libcurl$(LIBSFX).lib

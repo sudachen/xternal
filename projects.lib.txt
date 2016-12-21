@@ -4,4 +4,6 @@ libhash
 libpe
 libconf
 libsynfo
+libpict
+libcurl
 

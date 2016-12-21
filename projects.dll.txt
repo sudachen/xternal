@@ -9,3 +9,5 @@ libpe
 libconf
 libhash
 libsynfo
+libpict
+libcurl

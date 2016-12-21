@@ -1288,7 +1288,7 @@ int Str_Find_BOM(void *S)
 		return C_BOM_UTF16_LE;
 	if ( *(byte_t*)S == 0x0fe && ((byte_t*)S)[1] == 0x0ff )
 		return C_BOM_UTF16_BE;
-	if ( *(byte_t*)S == 0x0ef && ((byte_t*)S)[1] == 0x0bb && ((byte_t*)S)[1] == 0x0bf )
+	if ( *(byte_t*)S == 0x0ef && ((byte_t*)S)[1] == 0x0bb && ((byte_t*)S)[2] == 0x0bf )
 		return C_BOM_UTF8;
 	return C_BOM_DOESNT_PRESENT;
 }

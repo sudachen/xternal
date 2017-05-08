@@ -153,8 +153,8 @@ void Ptr_Get_Rgbaf_Pixel(const uint8_t *ptr, int format, PIXEL_RGBAf *rgba)
     else
     {
         PIXEL_RGBAi tmp;
-        Ptr_Get_Rgbai_Pixel(ptr, format, &tmp);
         PIXEL_RGBAf rgba;
+        Ptr_Get_Rgbai_Pixel(ptr, format, &tmp);
         rgba.r = (tmp.r + .5f) / 255.f;
         rgba.g = (tmp.g + .5f) / 255.f;
         rgba.b = (tmp.b + .5f) / 255.f;

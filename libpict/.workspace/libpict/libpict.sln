@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpict", "libpict.vcxproj", "{CC244B66-7756-441F-8576-82DEDB10BEDA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC244B66-7756-441F-8576-82DEDB10BEDA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CC244B66-7756-441F-8576-82DEDB10BEDA}.Debug|Win32.Build.0 = Debug|Win32
+		{CC244B66-7756-441F-8576-82DEDB10BEDA}.Release|Win32.ActiveCfg = Release|Win32
+		{CC244B66-7756-441F-8576-82DEDB10BEDA}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

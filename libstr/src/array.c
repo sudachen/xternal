@@ -146,7 +146,7 @@ void Array_Fill(ARRAY *a,size_t pos, size_t count, void *value)
     Str_Require(pos <= a->count);
 
     old_count = a->count;
-    Array_Grow(a->count + count);
+    Array_Grow(a, a->count + count);
 
     if ( pos < old_count )
         memmove(a->at+pos+1,a->at+pos,(old_count-pos)*sizeof(void *));
@@ -165,16 +165,17 @@ void *Array_Insert(ARRAY *a,size_t pos,void *value)
     Str_Require(pos <= a->count);
 
     old_count = a->count;
-    Array_Grow(a->count + 1);
+    Array_Grow(a, a->count + 1);
 
     if ( pos < old_count )
         memmove(a->at+pos+1,a->at+pos,sizeof(void *)*(old_count-pos));
     a->at[pos] = value;
+    return value;
 }
 
 void *Array_Push_Back(ARRAY *a,void *value)
 {
-    return Array_Insert(a,Array_Size(),value);
+    return Array_Insert(a,Array_Size(a),value);
 }
 
 void *Array_Push_Front(ARRAY *a,void *value)
@@ -308,8 +309,9 @@ size_t Array_Lower_Boundary(const ARRAY *a,void *value, int(*cmpfn)(const void *
         return 0;
     else
     {
-        size_t pos = Lower_Boundary(a->at,a->count,cmpfn,val,0);
+        size_t pos = Lower_Boundary(a->at,a->count,cmpfn,value,0);
         Str_Require( pos <= a->count );
+        return pos;
     }
 }
 
@@ -324,12 +326,14 @@ void *Array_Binary_Find(const ARRAY *a,void *value, int(*cmpfn)(const void *, co
     else
     {
         bool found = false;
-        size_t pos = Lower_Boundary(a->at,a->count,cmpfn,val,&found);
+        size_t pos = Lower_Boundary(a->at,a->count,cmpfn,value,&found);
         if ( found )
         {
             Str_Require(pos <= a->count);
             return a->at[pos];
         }
+        else
+            return 0;
     }
 }
 
@@ -356,7 +360,7 @@ void *Array_Sorted_Insert_Once(ARRAY *a,void *value, int(*cmpfn)(const void *, c
                 (a->at != NULL && a->capacity != 0 && a->count <= a->capacity ) );
 
 
-    pos = Lower_Boundary(a->at,a->count,cmpfn,val,&found);
+    pos = Lower_Boundary(a->at,a->count,cmpfn,value,&found);
     Str_Require( found && pos < a->count || !found && pos <= a->count );
     if ( !found )
         return Array_Insert(a,pos,value);

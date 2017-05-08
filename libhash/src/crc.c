@@ -1,4 +1,5 @@
 
+#include "../include/libhash/CRC8.h"
 #include "../include/libhash/CRC16.h"
 #include "../include/libhash/CRC32.h"
 

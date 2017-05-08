@@ -5,7 +5,7 @@ if "%MAKEIT_NAME%" == "" call :set_makeit_name "%MAKEIT_DIR:~0,-1%"
 
 set MAKEIT_ENV=x64
 if .%PROCESSOR_ARCHITECTURE%. == .x86. set MAKEIT_ENV=x32
-set MAKEIT_REL=debug
+if "%MAKEIT_REL%" == "" set MAKEIT_REL=debug
 set MAKEIT_DEPS=NO
 set MEKEIT_PROC_DIR=%~dp0
 set MAKEIT_DYNAMIC=dll

@@ -25,7 +25,7 @@
 #define __Str_Forceinline static __forceinline
 #define __Str_Noreturn __declspec(noreturn)
 #define __Str_Assert(Expr) _EVAL(_Static_assert(Expr,#Expr))
-#define Str_Require(Expr) assert(expr)
+#define Str_Require(Expr) assert(Expr)
 
 #define VARGS_COUNT_(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,...) a15
 #define VARGS_COUNT(...) _EVAL(VARGS_COUNT_(__VA_ARGS__,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0))
@@ -56,6 +56,7 @@ typedef struct
     void **at;
     size_t count;
     size_t capacity;
+    void (*f_free_valptr)(void *);
 } ARRAY;
 
 typedef struct
@@ -67,7 +68,6 @@ typedef struct
     };
     size_t count;
     size_t capacity;
-    void (*f_free_valptr)(void *);
 } BUFFER;
 
 typedef struct DICTO_REC DICTO_REC;
@@ -324,6 +324,7 @@ LIBSTR_EXPORTABLE void Array_Del(ARRAY *a,size_t pos);
 LIBSTR_EXPORTABLE void Array_Remove(ARRAY *a, size_t pos, size_t count);
 LIBSTR_EXPORTABLE void *Array_Sorted_Insert(ARRAY *a,void *value, int(*cmpfn)(const void *, const void *));
 LIBSTR_EXPORTABLE size_t Array_Lower_Boundary(const ARRAY *a,void *value, int(*cmpfn)(const void *, const void *));
+LIBSTR_EXPORTABLE void *Array_Binary_Find(const ARRAY *a,void *value, int(*cmpfn)(const void *, const void *));
 LIBSTR_EXPORTABLE void Array_Sort(ARRAY *a,int(*cmpfn)(const void *, const void *));
 LIBSTR_EXPORTABLE void Array_Swap(ARRAY *a1,ARRAY *a2);
 
@@ -378,14 +379,15 @@ typedef struct
 
 } FILE_STATS;
 
-struct
+typedef struct FILE_API FILE_API;
+struct FILE_API
 {
-    const char *(oj_fname)();
-    uint64_t (oj_length)();
-    uint64_t (oj_available)();
-    bool (oj_eof)();
-    const char *(oj_last_error_str)();
-    int (oj_last_error)();
+    const char *(*oj_fname)();
+    uint64_t (*oj_length)();
+    uint64_t (*oj_available)();
+    bool (*oj_eof)();
+    const char *(*oj_last_error_str)();
+    int (*oj_last_error)();
     void (*oj_close)(FILE_API *** oj);
     bool (*oj_read_line)(FILE_API **oj, BUFFER *bf);
     bool (*oj_write_line)(FILE_API **oj, const char *text);
@@ -395,7 +397,7 @@ struct
     int64_t (*oj_tall)(FILE_API **oj);
     void (*oj_flush)(FILE_API **oj);
     int64_t (*oj_truncate)(FILE_API **oj, uint64_t length);
-} FILE_API;
+};
 
 typedef struct
 {
@@ -404,18 +406,18 @@ typedef struct
 
 LIBSTR_EXPORTABLE const char *File_Last_Error_String();
 LIBSTR_EXPORTABLE int File_Last_Error();
-LIBSTR_EXPORTABLE int File_Check_Error(char *op, jmpbuf *catcher, FILE *f, char *fname, int look_to_errno);
+//LIBSTR_EXPORTABLE int File_Check_Error(char *op, jmpbuf *catcher, FILE *f, char *fname, int look_to_errno);
 LIBSTR_EXPORTABLE bool File_Get_Stats(const char *name,FILE_STATS *st);
 
-__Str_Forceinline time_t File_Ctime(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st->ctime; }
-__Str_Forceinline time_t File_Mtime(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st->mtime; }
-__Str_Forceinline uint64_t File_Length(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st->length; }
-__Str_Forceinline bool File_Exists(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st->f.exists; }
-__Str_Forceinline bool File_Is_Regular(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st->f.is_regular; }
-__Str_Forceinline bool File_Is_Directory(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st->f.is_directory; }
-__Str_Forceinline bool File_Is_Writable(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st->f.is_writable; }
-__Str_Forceinline bool File_Is_Readable(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st->f.is_readable; }
-__Str_Forceinline bool File_Is_Executable(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st->f.is_executable; }
+__Str_Forceinline time_t File_Ctime(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st.ctime; }
+__Str_Forceinline time_t File_Mtime(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st.mtime; }
+__Str_Forceinline uint64_t File_Length(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st.length; }
+__Str_Forceinline bool File_Exists(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st.f.exists; }
+__Str_Forceinline bool File_Is_Regular(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st.f.is_regular; }
+__Str_Forceinline bool File_Is_Directory(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st.f.is_directory; }
+__Str_Forceinline bool File_Is_Writable(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st.f.is_writable; }
+__Str_Forceinline bool File_Is_Readable(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st.f.is_readable; }
+__Str_Forceinline bool File_Is_Executable(const char *name) { FILE_STATS st= {0}; File_Get_Stats(name,&st); st.f.is_executable; }
 
 LIBSTR_EXPORTABLE char *Path_Basename(const char *path);
 LIBSTR_EXPORTABLE char *Path_Dirname(const char *path);

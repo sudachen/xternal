@@ -4,7 +4,6 @@ if not exist %~dp0posixtime.exe goto :notime
 for /F %%i in ('%~dp0posixtime.exe') do set BUILDTIME=%%i
 :notime
 if not exist %~dp0random.exe goto :norandom
-if not exist %~dp0libhash_64.dll goto :norandom
 for /F %%i in ('%~dp0random.exe') do set BUILDRANDOM=%%i
 :norandom
 cd %PROJECT_DIR%

@@ -13,5 +13,7 @@ if not .%PROCESSOR_ARCHITECTURE%. == .x86. call "%VS140COMNTOOLS%\..\..\VC\vcvar
 set TARGET_CPU=X64
 set TARGET_INFIX=_64r14
 
+call %~dp0PY3.cmd
+
 %*
 

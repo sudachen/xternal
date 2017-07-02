@@ -4,7 +4,7 @@
 set MAKEDIR=%~dp0
 call %~dp0Env\perl_home.cmd
 call %~dp0Env\python_home.cmd
-set PATH=%~dp0Env;%SystemRoot%;%SystemRoot%\System32;%~dp0Env\gnu;%PERL_HOME%\bin;%PYTHON_HOME%
+set PATH=%~dp0Env;%SystemRoot%;%SystemRoot%\System32;%SystemRoot%\System32\wbem;%~dp0Env\gnu;%PERL_HOME%\bin;%PYTHON_HOME%
 
 if "%XTERNAL%" == "" set XTERNAL=%~dp0
 

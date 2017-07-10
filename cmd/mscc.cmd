@@ -7,6 +7,7 @@ set M_CPU=64
 set M_RT=141
 set M_XP=
 set M_CMD=cl
+set M_ICL_SETUP=0
 
 :arg_repeat
 if :%1: == :: goto :arg_end
@@ -67,13 +68,23 @@ for %%i in ("/Dump" "-Dump") do (
 	)
 )
 
+for %%i in ("/Icl" "-Icl") do (
+	if :%1: == :%%~i: ( 
+	       	set M_CMD=icl.exe
+                set M_ICL_SETUP=1
+       		set arg_append=0
+	)
+)
+
 for %%i in ("/Help" "-Help") do (
 	if :%1: == :%%~i: ( 
                 echo use mscc [Opts] [Tool Args]
                 echo     mscc hello.c            ~ compiles hello.c with VS2017 for amd64
+	        echo     mscc -Icl -r100 hello.c ~ compiles hello.c with Intel Composer/VS2010
 	        echo     mscc -m32 -r140 hello.c ~ compiles hello.c with VS2015 for i386
 	        echo     mscc -m64 -r9 -Make     ~ runs nmake with VS2008 for amd64
                 echo Possible Opts:
+		echo     -Icl  ~ to use Intel Composer XE
 		echo     -Link ~ to use LINK 
 		echo     -Lib  ~ to use LIB
 		echo     -Dump ~ to use DUMPBIN
@@ -104,5 +115,15 @@ if "%M_XP%" == "XP" (
 )
 
 if not "x%M_LINK%" == "x" set args=-DUSING_V110_SDK71 %args% -link "%M_LINK%"
+
+if not "x%ICLVARS_BAT%" == "x" goto :icl_arch
+if .%PROCESSOR_ARCHITECTURE%. == .x86. set ICLVARS_BAT=%ProgramFiles%\Intel\Composer XE\bin\iclvars.bat
+if not .%PROCESSOR_ARCHITECTURE%. == .x86. set ICLVARS_BAT=%ProgramFiles(x86)%\Intel\Composer XE\bin\iclvars.bat
+:icl_arch
+if "x%M_ICL_SETUP%" == "x1" (
+	if %M_CPU% == 32 set ICL_ARCH=ia32
+	if %M_CPU% == 64 set ICL_ARCH=intel64
+)
+if "x%M_ICL_SETUP%" == "x1" call "%ICLVARS_BAT%" %ICL_ARCH% >NUL
 
 %CLX%xternal.cmd env%M_CPU%_%M_RT% %M_CMD% %args%
